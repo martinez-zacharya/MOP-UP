@@ -51,19 +51,19 @@ delim = answers['delimiter']
 minimumidentity = answers['miniden']
 minimumoverlap = answers['minover']
 
-# subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
-# subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
+subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
+subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
 
-# with open('silixoutput.txt', 'w') as file:
-# 	subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
+with open('silixoutput.txt', 'w') as file:
+	subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
-# CutToGenome('silixoutput.txt', delim)
+CutToGenome('silixoutput.txt', delim)
 
-# if answers['singleton'] == True:
-# 	RemoveSingletons('CutFile.txt')
-# 	CodeGenomes('CutFileSinless.txt')
-# else:
-# 	CodeGenomes('CutFile.txt')
+if answers['singleton'] == True:
+	RemoveSingletons('CutFile.txt')
+	CodeGenomes('CutFileSinless.txt')
+else:
+	CodeGenomes('CutFile.txt')
 
 #Change N to 100 when deployed
 subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '2', 'Coded.txt', './'])
