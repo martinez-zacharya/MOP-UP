@@ -1,14 +1,14 @@
 import os
 import pandas
 
-def CutToGenome(file):
+def CutToGenome(file, delimiter):
 	f = open(file, "r")
 	n = open('CutFile.txt', 'a+')
 	data = f.readlines()
 
 	for line in data:
 		line = line.split('	')
-		line0list = line[1].split('=')
+		line0list = line[1].split(delimiter)
 		n.write(line0list[0] + ' ' + line[0] + '\n')
 
 	f.close()

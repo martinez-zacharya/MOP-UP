@@ -21,6 +21,23 @@ questions = [
 
 	},
 	{
+		'type': 'input',
+		'name': 'delimiter',
+		'message': 'Enter delimiter between genome and gene in fasta file'
+	},
+	{
+		'type': 'input',
+		'name': 'miniden',
+		'message': 'Enter minimum percent identity to accept blast hits \n for building families, or press enter to use default of 35%',
+		'default': '.35'
+	},
+	{
+		'type': 'input',
+		'name': 'minover',
+		'message': 'Enter minimum percent overlap to accept blast hits \n for building familes, or press enter to use default of 80%',
+		'default': '.8'
+	},
+	{
 		'type': 'confirm',
 		'name': 'singleton',
 		'message': 'Do you wish to remove singletons?'
@@ -30,20 +47,23 @@ questions = [
 answers = prompt(questions)
 
 fasta = answers['fasta']
+delim = answers['delimiter']
+minimumidentity = answers['miniden']
+minimumoverlap = answers['minover']
 
-subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
-subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
+# subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
+# subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
 
-with open('silixoutput.txt', 'w') as file:
-	subprocess.run(["silix", fasta, "allvall.csv"], stdout = file)
+# with open('silixoutput.txt', 'w') as file:
+# 	subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
-CutToGenome('silixoutput.txt')
+# CutToGenome('silixoutput.txt', delim)
 
-if answers['singleton'] == True:
-	RemoveSingletons('CutFile.txt')
-	CodeGenomes('CutFileSinless.txt')
-else:
-	CodeGenomes('CutFile.txt')
+# if answers['singleton'] == True:
+# 	RemoveSingletons('CutFile.txt')
+# 	CodeGenomes('CutFileSinless.txt')
+# else:
+# 	CodeGenomes('CutFile.txt')
 
 #Change N to 100 when deployed
 subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '2', 'Coded.txt', './'])
@@ -88,7 +108,7 @@ spreadf = newdf.drop_duplicates(keep = 'first', inplace=False)
 spreadf = spreadf.drop(columns = ["Cluster", "B_y", "B_x", "C", "A_y", "C"])
 #Drops duplicates
 spreadf = spreadf.drop_duplicates(keep='first', inplace=False)
-spreadf.to_csv('MasterMagsHumanProTest.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
+spreadf.to_csv('Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
 
 
 #This output is to visualize on cytoscape where subgroups only connect to PCs
@@ -100,7 +120,7 @@ df11 = df5.drop(columns=["A_y"])
 grouped = df11.groupby(['Genome_y', 'Cluster']).size()
 df22 = grouped.to_frame().reset_index()
 #Import Master csv
-masterdf=pandas.read_csv('MasterMagsHumanProTest.csv', delimiter=',')
+masterdf=pandas.read_csv('Master.csv', delimiter=',')
 #Gets counts for the number of genomes in each subgroup
 newcol = masterdf['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 #Merges the counts for each subgroup with the grouped df that has the counts for
@@ -121,12 +141,12 @@ subsetdfnew = subsetdf.merge(df66, how = 'left', left_on = 'ProteinCluster', rig
 subsetdfnew = subsetdfnew.drop_duplicates(subset = ['ID','ProteinCluster'], keep = 'first', inplace = False)
 subsetdfnew = subsetdfnew.drop(columns=['ProteinCluster', 'Genome_y'])
 subsetdfnew = subsetdfnew[['ID', 'CountOfID', 'Gene']]
-subsetdfnew.to_csv("Adjusted50MagsHumanProTest.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+subsetdfnew.to_csv("ForCytoscape50Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 
 #For normal cytoscape visualization
 df5 = df5.drop_duplicates(keep = 'first', inplace=False)
-masterdf2 = pandas.read_csv('MasterMagsHumanProTest.csv', delimiter = ',')
+masterdf2 = pandas.read_csv('Master.csv', delimiter = ',')
 newcol2 = masterdf2['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 df5 = df5.merge(newcol2, how = 'left', left_on='Genome_y', right_on='Unique')
 df5 = df5.drop(columns=['A_y', 'Unique'])
@@ -134,5 +154,7 @@ silixdf = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace
 df6 = df5.merge(silixdf, how='left', left_on='Cluster', right_on='ProteinCluster')
 df6 = df6.drop(columns=['ProteinCluster', 'Cluster'])
 silixdf['Annot'] = 'ProtCluster'
-silixdf.to_csv('MagsHumanProAnnotationsTest.csv', sep=',', index=None, mode='w')
-df6.to_csv('MergedMagsHumanProTest.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+silixdf.to_csv('CytoscapeAnnotations.csv', sep=',', index=None, mode='w')
+df6.to_csv('ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+
+subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
