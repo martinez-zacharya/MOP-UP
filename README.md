@@ -1,4 +1,4 @@
-Version : 0.1.0
+Version : 0.1.1
 
 
 **SETUP**
@@ -19,10 +19,10 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 		5. Figlet (pip3 install pyfiglet)
 		6. PyInquierer (pip3 install PyInquirer)
 
-3. You need a fasta file with no spaces in the name, as well as an '=' character that serves as a cutoff between genome name and gene name, where to the left of the '=' is the genome and to the right is the gene. This is incredibly important, don't overlook this!
+3. You need a fasta file with no spaces in the name, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "=".
 
 	> Ex. GCA_010101_weight=1.5
-	>   	GCA_010101_weight=2.9
+	>     	GCA_010101_weight=2.9
 
 
 **RUNNING**
