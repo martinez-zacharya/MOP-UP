@@ -131,7 +131,7 @@ df11 = df5.drop(columns=["A_y"])
 grouped = df11.groupby(['Genome_y', 'Cluster']).size()
 df22 = grouped.to_frame().reset_index()
 #Import Master csv
-masterdf=pandas.read_csv('Master.csv', delimiter=',')
+masterdf=pandas.read_csv(runname + 'Master.csv', delimiter=',')
 #Gets counts for the number of genomes in each subgroup
 newcol = masterdf['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 #Merges the counts for each subgroup with the grouped df that has the counts for
@@ -157,7 +157,7 @@ subsetdfnew.to_csv(runname + "ForCytoscape50Percent.csv", sep=',', index=None, m
 
 #For normal cytoscape visualization
 df5 = df5.drop_duplicates(keep = 'first', inplace=False)
-masterdf2 = pandas.read_csv('Master.csv', delimiter = ',')
+masterdf2 = pandas.read_csv(runname + 'Master.csv', delimiter = ',')
 newcol2 = masterdf2['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 df5 = df5.merge(newcol2, how = 'left', left_on='Genome_y', right_on='Unique')
 df5 = df5.drop(columns=['A_y', 'Unique'])
