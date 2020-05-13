@@ -29,6 +29,6 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 
 To run, first make sure that diamond is in the file you are currently in, as well as the python scripts that come with the package. Then, just type
 
-```$ python3 BipartitePipeline010.py```
+```$ python3 BipartitePipeline.py```
 
 and follow the instructions! Good luck :)
