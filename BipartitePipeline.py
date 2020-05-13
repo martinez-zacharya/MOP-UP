@@ -16,6 +16,12 @@ questions = [
 
 	{
 		'type': 'input',
+		'name': 'nameofrun',
+		'message': 'Please enter the name of the run'
+
+	},
+	{
+		'type': 'input',
 		'name': 'fasta',
 		'message': 'Please enter path to file for the fasta file'
 
@@ -23,18 +29,18 @@ questions = [
 	{
 		'type': 'input',
 		'name': 'delimiter',
-		'message': 'Enter delimiter between genome and gene in fasta file'
+		'message': 'Please enter delimiter between genome and gene in fasta file'
 	},
 	{
 		'type': 'input',
 		'name': 'miniden',
-		'message': 'Enter minimum percent identity to accept blast hits \n for building families, or press enter to use default of 35%',
+		'message': 'Please enter minimum percent identity to accept blast hits \n for building families, or press enter to use default of 35%',
 		'default': '.35'
 	},
 	{
 		'type': 'input',
 		'name': 'minover',
-		'message': 'Enter minimum percent overlap to accept blast hits \n for building familes, or press enter to use default of 80%',
+		'message': 'Please enter minimum percent overlap to accept blast hits \n for building familes, or press enter to use default of 80%',
 		'default': '.8'
 	},
 	{
@@ -51,6 +57,7 @@ delim = answers['delimiter']
 minimumidentity = answers['miniden']
 minimumoverlap = answers['minover']
 sinless = answers['singleton']
+runname = answers['nameofrun']
 
 subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
 subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
@@ -112,7 +119,7 @@ spreadf = newdf.drop_duplicates(keep = 'first', inplace=False)
 spreadf = spreadf.drop(columns = ["Cluster", "B_y", "B_x", "C", "A_y", "C"])
 #Drops duplicates
 spreadf = spreadf.drop_duplicates(keep='first', inplace=False)
-spreadf.to_csv('Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
+spreadf.to_csv(runname + 'Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
 
 
 #This output is to visualize on cytoscape where subgroups only connect to PCs
@@ -145,7 +152,7 @@ subsetdfnew = subsetdf.merge(df66, how = 'left', left_on = 'ProteinCluster', rig
 subsetdfnew = subsetdfnew.drop_duplicates(subset = ['ID','ProteinCluster'], keep = 'first', inplace = False)
 subsetdfnew = subsetdfnew.drop(columns=['ProteinCluster', 'Genome_y'])
 subsetdfnew = subsetdfnew[['ID', 'CountOfID', 'Gene']]
-subsetdfnew.to_csv("ForCytoscape50Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+subsetdfnew.to_csv(runname + "ForCytoscape50Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 
 #For normal cytoscape visualization
@@ -158,7 +165,7 @@ silixdf = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace
 df6 = df5.merge(silixdf, how='left', left_on='Cluster', right_on='ProteinCluster')
 df6 = df6.drop(columns=['ProteinCluster', 'Cluster'])
 silixdf['Annot'] = 'ProtCluster'
-silixdf.to_csv('CytoscapeAnnotations.csv', sep=',', index=None, mode='w')
-df6.to_csv('ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+silixdf.to_csv(runname + 'CytoscapeAnnotations.csv', sep=',', index=None, mode='w')
+df6.to_csv(runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
