@@ -50,6 +50,7 @@ fasta = answers['fasta']
 delim = answers['delimiter']
 minimumidentity = answers['miniden']
 minimumoverlap = answers['minover']
+sinless = answers['singleton']
 
 subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
 subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
@@ -78,7 +79,10 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
 #Import Silix data that has genomes to protein clusters
-decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
+if sinless == 'Y' or 'y':
+	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
+else:
+	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
 
 #Merge infomap input with genomes to protein clusters to get a table with network ID and
 #Protein clusters from infomap input, and also genomes and protein clusters from the modified
