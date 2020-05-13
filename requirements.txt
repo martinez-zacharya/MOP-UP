@@ -1,0 +1,5 @@
+pip3 install pandas
+pip3 install subprocess.run
+pip3 install infomap
+pip3 install pyfiglet
+pip3 install PyInquirer
