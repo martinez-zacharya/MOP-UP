@@ -86,7 +86,7 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
 #Import Silix data that has genomes to protein clusters
-if sinless == 'Y' or 'y':
+if answers['singleton'] == True:
 	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
 else:
 	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
