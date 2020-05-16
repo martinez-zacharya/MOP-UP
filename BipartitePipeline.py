@@ -123,7 +123,7 @@ spreadf.to_csv(runname + 'Master.csv', mode='w', header = ["NetworkID","Genome",
 
 
 #This output is to visualize on cytoscape where subgroups only connect to PCs
-#if >= 50% of the genomes in the subgroup have it
+#if >= 75% of the genomes in the subgroup have it
 df5.to_csv("prelim50MagsHumanProTest.csv", sep=',', index=None, mode='w')
 df11 = df5.drop(columns=["A_y"])
 #This groups the df by genome and protein cluster and gives the counts of each PC
@@ -140,9 +140,9 @@ df33 = df22.merge(newcol, how = 'left', left_on='Genome_y', right_on='Unique')
 df33 = df33.drop(columns=['Unique'])
 df33.to_csv("GroupedMagsHumanProTest.csv", sep=',', mode='w', header=["ID", "ProteinCluster", "CountofProtein", "CountOfID"], index = None)
 newdf2 = pandas.read_csv('GroupedMagsHumanProTest.csv', delimiter=',')
-#Takes a subset of df where subgroups only connect to PCs that 50% or more
+#Takes a subset of df where subgroups only connect to PCs that 75% or more
 #of their genomes have it
-subsetdf = newdf2[newdf2['CountofProtein'] >= (newdf2['CountOfID']/2)]
+subsetdf = newdf2[newdf2['CountofProtein'] >= ((newdf2['CountOfID']) * 0.75)]
 subsetdf = subsetdf.drop(columns=['CountofProtein'])
 df55 = df5.drop_duplicates(keep = 'first', inplace=False)
 silixdf2 = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
@@ -152,7 +152,7 @@ subsetdfnew = subsetdf.merge(df66, how = 'left', left_on = 'ProteinCluster', rig
 subsetdfnew = subsetdfnew.drop_duplicates(subset = ['ID','ProteinCluster'], keep = 'first', inplace = False)
 subsetdfnew = subsetdfnew.drop(columns=['ProteinCluster', 'Genome_y'])
 subsetdfnew = subsetdfnew[['ID', 'CountOfID', 'Gene']]
-subsetdfnew.to_csv(runname + "ForCytoscape50Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+subsetdfnew.to_csv(runname + "ForCytoscape75Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 
 #For normal cytoscape visualization
