@@ -72,7 +72,7 @@ with open('clusteroutput.txt', 'w') as file:
 	subprocess.run(["mkdir", "temp"])
 	subprocess.run(["mmseqs", "createdb", fasta, "DB"])
 	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "DB_clu.index", "temp"])
-	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", file])
+	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", "clusteroutput.txt"])
 	# subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
 CutToGenome('clusteroutput.txt', delim)
@@ -84,7 +84,7 @@ else:
 	CodeGenomes('CutFile.txt')
 
 # #Change N to 100 when deployed
-subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '2', 'Coded.txt', './'])
+subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded.txt', './'])
 
 #Import Silix output
 silixdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
