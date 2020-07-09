@@ -191,5 +191,4 @@ df6 = df6.drop(columns=['ProteinCluster', 'Cluster'])
 clustdf['Annot'] = 'ProtCluster'
 df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
-subprocess.run(['mv', ""])
 subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
