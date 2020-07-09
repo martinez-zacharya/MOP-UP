@@ -90,6 +90,7 @@ subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded
 
 #Import Silix output
 clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
+clustdf = clustdf[["Gene", "ProteinCluster"]]
 
 #Import raw InfoMap output
 df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], comment = '#')
