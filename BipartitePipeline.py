@@ -47,6 +47,11 @@ questions = [
 		'type': 'confirm',
 		'name': 'singleton',
 		'message': 'Do you wish to remove singletons?'
+	},
+	{
+		'type': 'input',
+		'name': 'diamondthreads',
+		'message': 'Please enter number of threads you want to use for Diamond'
 	}
 ]
 
@@ -58,26 +63,31 @@ minimumidentity = answers['miniden']
 minimumoverlap = answers['minover']
 sinless = answers['singleton']
 runname = answers['nameofrun']
+threads = answers['diamondthreads']
 
-# subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
-# subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv"])
+subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
+subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv", "-p", "12"])
 
-# with open('silixoutput.txt', 'w') as file:
-# 	subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
+with open('clusteroutput.txt', 'w') as file:
+	subprocess.run(["mkdir", "temp"])
+	subprocess.run(["mmseqs", "createdb", fasta, "DB"])
+	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "DB_clu.index", "temp"])
+	subprocess.run(["mmseqs", "createtsv", "DB", "DB", "DB_clu", file])
+	# subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
-# CutToGenome('silixoutput.txt', delim)
+CutToGenome('clusteroutput.txt', delim)
 
-# if answers['singleton'] == True:
-# 	RemoveSingletons('CutFile.txt')
-# 	CodeGenomes('CutFileSinless.txt')
-# else:
-# 	CodeGenomes('CutFile.txt')
+if answers['singleton'] == True:
+	RemoveSingletons('CutFile.txt')
+	CodeGenomes('CutFileSinless.txt')
+else:
+	CodeGenomes('CutFile.txt')
 
 # #Change N to 100 when deployed
-# subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '2', 'Coded.txt', './'])
+subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '2', 'Coded.txt', './'])
 
 #Import Silix output
-silixdf = pandas.read_csv('silixoutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
+silixdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
 
 #Import raw InfoMap output
 df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], comment = '#')
@@ -85,11 +95,14 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 #Import infomap input
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
-#Import Silix data that has genomes to protein clusters
+Import Silix data that has genomes to protein clusters
 if answers['singleton'] == True:
 	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
 else:
 	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
+
+decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
+runname = 'testing'
 
 #Merge infomap input with genomes to protein clusters to get a table with network ID and
 #Protein clusters from infomap input, and also genomes and protein clusters from the modified
@@ -143,16 +156,24 @@ newdf2 = pandas.read_csv('GroupedMagsHumanProTest.csv', delimiter=',')
 #Takes a subset of df where subgroups only connect to PCs that 75% or more
 #of their genomes have it
 subsetdf = newdf2[newdf2['CountofProtein'] >= ((newdf2['CountOfID']) * 0.75)]
+leftoutdf = newdf2[newdf2['CountofProtein'] < ((newdf2['CountOfID']) * 0.75)]
+leftoutdf = leftoutdf.drop(columns=['CountofProtein'])
 subsetdf = subsetdf.drop(columns=['CountofProtein'])
 df55 = df5.drop_duplicates(keep = 'first', inplace=False)
 silixdf2 = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
 df66 = df55.merge(silixdf2, how='left', left_on='Cluster', right_on='ProteinCluster')
 df66 = df66.drop(columns=['Cluster', 'A_y'])
 subsetdfnew = subsetdf.merge(df66, how = 'left', left_on = 'ProteinCluster', right_on = 'ProteinCluster')
+leftoutdfnew = leftoutdf.merge(df66, how='left',left_on = 'ProteinCluster', right_on = 'ProteinCluster')
 subsetdfnew = subsetdfnew.drop_duplicates(subset = ['ID','ProteinCluster'], keep = 'first', inplace = False)
 subsetdfnew = subsetdfnew.drop(columns=['ProteinCluster', 'Genome_y'])
+leftoutdfnew = leftoutdfnew.drop_duplicates(subset = ['ID','ProteinCluster'], keep = 'first', inplace = False)
+leftoutdfnew = leftoutdfnew.drop(columns=['ProteinCluster', 'Genome_y'])
 subsetdfnew = subsetdfnew[['ID', 'CountOfID', 'Gene']]
-subsetdfnew.to_csv(runname + "ForCytoscape75Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+leftoutdfnew = leftoutdfnew[['ID', 'CountOfID', 'Gene']]
+leftoutdfnew = leftoutdfnew.drop(columns=['Gene'])
+cyto75 = pandas.concat([subsetdfnew, leftoutdfnew], sort=False)
+cyto75.to_csv(runname + "ForCytoscape75Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 
 #For normal cytoscape visualization
