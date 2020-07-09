@@ -9,7 +9,7 @@ def CutToGenome(file, delimiter):
 	for line in data:
 		line = line.split('	')
 		line0list = line[0].split(delimiter)
-		n.write(line0list[0] + ' ' + line[1] + '\n')
+		n.write(line0list[0] + ' ' + line[1])
 
 	f.close()
 	n.close()
