@@ -95,7 +95,7 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 #Import infomap input
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
-Import Silix data that has genomes to protein clusters
+# Import Silix data that has genomes to protein clusters
 if answers['singleton'] == True:
 	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
 else:
