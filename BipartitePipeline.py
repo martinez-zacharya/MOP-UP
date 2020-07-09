@@ -71,8 +71,8 @@ subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.cs
 with open('clusteroutput.txt', 'w') as file:
 	subprocess.run(["mkdir", "temp"])
 	subprocess.run(["mmseqs", "createdb", fasta, "DB"])
-	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "DB_clu.index", "temp"])
-	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", "clusteroutput.txt"])
+	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "temp"])
+	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", file])
 	# subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
 CutToGenome('clusteroutput.txt', delim)
