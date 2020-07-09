@@ -65,14 +65,17 @@ sinless = answers['singleton']
 runname = answers['nameofrun']
 threads = answers['diamondthreads']
 
+outputpath = "/stor/work/Ochman/ZMart/BipartitePipeline/output"
+
 subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
 subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv", "-p", threads])
 
 with open('clusteroutput.txt', 'w') as file:
 	subprocess.run(["mkdir", "temp"])
+	subprocess.run(["mkdir", "output"])
 	subprocess.run(["mmseqs", "createdb", fasta, "DB"])
 	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "temp"])
-	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", file])
+	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", "clusteroutput.txt"])
 	# subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
 
 CutToGenome('clusteroutput.txt', delim)
@@ -87,7 +90,7 @@ else:
 subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded.txt', './'])
 
 #Import Silix output
-silixdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
+clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
 
 #Import raw InfoMap output
 df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], comment = '#')
@@ -132,12 +135,12 @@ spreadf = newdf.drop_duplicates(keep = 'first', inplace=False)
 spreadf = spreadf.drop(columns = ["Cluster", "B_y", "B_x", "C", "A_y", "C"])
 #Drops duplicates
 spreadf = spreadf.drop_duplicates(keep='first', inplace=False)
-spreadf.to_csv(runname + 'Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
+spreadf.to_csv(outputpath + runname + 'Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
 
 
 #This output is to visualize on cytoscape where subgroups only connect to PCs
 #if >= 75% of the genomes in the subgroup have it
-df5.to_csv("prelim50MagsHumanProTest.csv", sep=',', index=None, mode='w')
+df5.to_csv(outputpath + "prelim50MagsHumanProTest.csv", sep=',', index=None, mode='w')
 df11 = df5.drop(columns=["A_y"])
 #This groups the df by genome and protein cluster and gives the counts of each PC
 #in each group. Then it creates a dataframe from it
@@ -151,7 +154,7 @@ newcol = masterdf['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 #each PC in each subgroup
 df33 = df22.merge(newcol, how = 'left', left_on='Genome_y', right_on='Unique')
 df33 = df33.drop(columns=['Unique'])
-df33.to_csv("GroupedMagsHumanProTest.csv", sep=',', mode='w', header=["ID", "ProteinCluster", "CountofProtein", "CountOfID"], index = None)
+df33.to_csv(outputpath + "GroupedMagsHumanProTest.csv", sep=',', mode='w', header=["ID", "ProteinCluster", "CountofProtein", "CountOfID"], index = None)
 newdf2 = pandas.read_csv('GroupedMagsHumanProTest.csv', delimiter=',')
 #Takes a subset of df where subgroups only connect to PCs that 75% or more
 #of their genomes have it
@@ -160,8 +163,8 @@ leftoutdf = newdf2[newdf2['CountofProtein'] < ((newdf2['CountOfID']) * 0.75)]
 leftoutdf = leftoutdf.drop(columns=['CountofProtein'])
 subsetdf = subsetdf.drop(columns=['CountofProtein'])
 df55 = df5.drop_duplicates(keep = 'first', inplace=False)
-silixdf2 = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
-df66 = df55.merge(silixdf2, how='left', left_on='Cluster', right_on='ProteinCluster')
+clustdf2 = clustdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
+df66 = df55.merge(clustdf2, how='left', left_on='Cluster', right_on='ProteinCluster')
 df66 = df66.drop(columns=['Cluster', 'A_y'])
 subsetdfnew = subsetdf.merge(df66, how = 'left', left_on = 'ProteinCluster', right_on = 'ProteinCluster')
 leftoutdfnew = leftoutdf.merge(df66, how='left',left_on = 'ProteinCluster', right_on = 'ProteinCluster')
@@ -173,7 +176,7 @@ subsetdfnew = subsetdfnew[['ID', 'CountOfID', 'Gene']]
 leftoutdfnew = leftoutdfnew[['ID', 'CountOfID', 'Gene']]
 leftoutdfnew = leftoutdfnew.drop(columns=['Gene'])
 cyto75 = pandas.concat([subsetdfnew, leftoutdfnew], sort=False)
-cyto75.to_csv(runname + "ForCytoscape75Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+cyto75.to_csv(outputpath + runname + "ForCytoscape75Percent.csv", sep=',', index=None, mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 
 #For normal cytoscape visualization
@@ -182,11 +185,11 @@ masterdf2 = pandas.read_csv(runname + 'Master.csv', delimiter = ',')
 newcol2 = masterdf2['Subgroup'].value_counts().rename_axis('Unique').reset_index()
 df5 = df5.merge(newcol2, how = 'left', left_on='Genome_y', right_on='Unique')
 df5 = df5.drop(columns=['A_y', 'Unique'])
-silixdf = silixdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
-df6 = df5.merge(silixdf, how='left', left_on='Cluster', right_on='ProteinCluster')
+clustdf = clustdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
+df6 = df5.merge(clustdf, how='left', left_on='Cluster', right_on='ProteinCluster')
 df6 = df6.drop(columns=['ProteinCluster', 'Cluster'])
-silixdf['Annot'] = 'ProtCluster'
-silixdf.to_csv(runname + 'CytoscapeAnnotations.csv', sep=',', index=None, mode='w')
-df6.to_csv(runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
+clustdf['Annot'] = 'ProtCluster'
+clustdf.to_csv(outputpath + runname + 'CytoscapeAnnotations.csv', sep=',', index=None, mode='w')
+df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
