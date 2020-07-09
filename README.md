@@ -9,7 +9,7 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 
 2. You need to install various things including
   	1. If using Ubuntu (you should be), build-essential (sudo apt-get install build-essential)
-  	2. Silix http://lbbe.univ-lyon1.fr/Download,3009.html?lang=fr
+  	2. MMseqs2 https://github.com/soedinglab/MMseqs2/wiki#clustering-databases-using-mmseqs-cluster-or-mmseqs-linclust
   	3. Diamond http://www.diamondsearch.org/index.php?pages/installation/
   	4. Python 3 and several packages using pip including
 		1. Pip (sudo apt install python-pip)
