@@ -1,5 +1,6 @@
 import os
 import pandas
+from Bio import SeqIO
 
 def CutToGenome(file, delimiter):
 	f = open(file, "r")
@@ -8,8 +9,8 @@ def CutToGenome(file, delimiter):
 
 	for line in data:
 		line = line.split('	')
-		line0list = line[0].split(delimiter)
-		n.write(line0list[0] + ' ' + line[1])
+		line0list = line[1].split(delimiter)
+		n.write(line0list[0] + ' ' + line[0] + '\n')
 
 	f.close()
 	n.close()
@@ -40,3 +41,61 @@ def CodeGenomes(file):
 		n.write(str(accdict[line[0]]) + ' ' + line[1])
 	f.close()
 	n.close()
+
+def ExtractFamilies(clustfile, cytofile, fastafile, outfolder):
+	silix = pandas.read_csv(clustfile, delimiter = '	', names = ['ProteinCluster', 'Gene'])
+
+	cyto = pandas.read_csv(cytofile)
+
+	cyto = cyto[cyto.duplicated(subset='ProteinCluster', keep=False)]
+
+	cyto = cyto.drop(columns=['Subgroup', 'SubgroupCount'])
+
+	silixuniq = silix.drop_duplicates(subset='ProteinCluster', keep='first', inplace=False)
+
+	cytosilix = cyto.merge(silixuniq, how = 'left', left_on = 'ProteinCluster', right_on = 'Gene')
+
+	cytosilix = cytosilix.merge(silix, how = 'left', left_on = 'ProteinCluster_y', right_on = 'ProteinCluster')
+
+	cytosilix = cytosilix.drop(columns = ['Gene_x', 'ProteinCluster_y'])
+
+	cytosilix = cytosilix.drop_duplicates(keep = 'first', inplace=False)
+
+	clustname = cytosilix.drop_duplicates(subset = 'ProteinCluster_x', keep='first', inplace=False)
+
+	clustlist = clustname['ProteinCluster_x'].tolist()
+
+
+	for clust in clustlist:
+		newfile = open(outfolder + str(clust)+'.fasta', 'a+')
+		snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
+		snippeddf = snippeddf.reset_index(drop=True)
+		for i in range(len(snippeddf)):
+			fasta_sequences = SeqIO.parse(fastafile, "fasta")
+			for fasta in fasta_sequences:
+				name, sequence = fasta.id, str(fasta.seq)
+				if str(clust) == snippeddf.loc[i, "ProteinCluster_x"] and name == snippeddf.loc[i, "Gene_y"]:
+					SeqIO.write(fasta, newfile, "fasta")
+		newfile.close()
+
+def ExtractTitulars(cytofile, fastafile, yn):
+	df = pandas.read_csv(cytofile)
+
+	#y = yes, only keep proteins that make connections
+	#n = no, keep all proteins
+	if yn == True:
+		df = df[df.duplicated(subset=['ProteinCluster'], keep='first')]
+
+	proteins = df['ProteinCluster']
+
+	proteins = proteins.drop_duplicates(keep='first')
+
+	outfasta = open('TitularProteins.fasta', 'a+')
+
+	for protein in proteins:
+		fastas = SeqIO.parse(fastafile, "fasta")
+		for fasta in fastas:
+			name, sequence = fasta.id, str(fasta.seq)
+			if name == protein:
+				SeqIO.write(fasta, outfasta, "fasta")
+	outfasta.close()

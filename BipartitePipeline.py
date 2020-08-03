@@ -3,7 +3,7 @@ import os
 import pandas
 import subprocess
 import infomap
-from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes
+from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies
 from pyfiglet import Figlet
 from PyInquirer import prompt
 from pprint import pprint
@@ -52,6 +52,16 @@ questions = [
 		'type': 'input',
 		'name': 'diamondthreads',
 		'message': 'Please enter number of threads you want to use for Diamond'
+	},
+	{
+		'type': 'input',
+		'name': 'outputfolder',
+		'message': 'Please enter full path of output folder'
+	},
+	{
+		'type': 'confirm',
+		'name': 'connect',
+		'message': 'Do you wish to only keep proteins that make connections in the output?'
 	}
 ]
 
@@ -64,19 +74,22 @@ minimumoverlap = answers['minover']
 sinless = answers['singleton']
 runname = answers['nameofrun']
 threads = answers['diamondthreads']
+outputpath = answers['outputfolder']
+connect = answers['connect']
 
-outputpath = "/stor/work/Ochman/ZMart/BipartitePipeline/output/"
 
-subprocess.run(["./diamond", "makedb", "--in", fasta, "-d", "db"])
-subprocess.run(["./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv", "-p", threads])
+subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "makedb", "--in", fasta, "-d", "db"])
+subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv", "-p", threads])
+
+outputpath = outputpath + "/output"
 
 with open('clusteroutput.txt', 'w') as file:
-	subprocess.run(["mkdir", "temp"])
-	subprocess.run(["mkdir", "output"])
-	subprocess.run(["mmseqs", "createdb", fasta, "DB"])
-	subprocess.run(["mmseqs", "cluster", "DB", "DB_clu", "temp"])
-	subprocess.run(["mmseqs", "createtsv", "DB", "DB_clu", "clusteroutput.txt"])
-	# subprocess.run(["silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
+	subprocess.run(["mkdir", outputpath])
+	subprocess.run(["/stor/home/zam425/bin/silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
+
+outputog = outputpath
+
+outputpath = outputpath + '/'
 
 CutToGenome('clusteroutput.txt', delim)
 
@@ -87,10 +100,10 @@ else:
 	CodeGenomes('CutFile.txt')
 
 # #Change N to 100 when deployed
-subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded.txt', './'])
+subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '1', 'Coded.txt', './'])
 
 #Import Silix output
-clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['Gene', 'ProteinCluster'])
+clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
 
 #Import raw InfoMap output
 df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], comment = '#')
@@ -105,7 +118,6 @@ else:
 	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
 
 decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
-runname = 'testing'
 
 #Merge infomap input with genomes to protein clusters to get a table with network ID and
 #Protein clusters from infomap input, and also genomes and protein clusters from the modified
@@ -192,3 +204,20 @@ clustdf['Annot'] = 'ProtCluster'
 df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
 subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
+
+path = os.path.abspath(os.getcwd())
+
+clustpath = str(path) + '/clusteroutput.txt'
+
+os.rename(clustpath, outputpath+'clusteroutput.txt')
+
+os.chdir(outputpath)
+
+#titularproteins
+ExtractTitulars(outputpath+runname+'ForCytoscape.csv', fasta, connect)
+
+#ProteinFamilies
+subprocess.run(['mkdir', 'ProteinFamilies'])
+outfolder = outputpath + 'ProteinFamilies/'
+ExtractFamilies('clusteroutput.txt', runname+'ForCytoscape.csv', fasta, outfolder)
+
