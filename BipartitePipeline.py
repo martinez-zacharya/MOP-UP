@@ -100,7 +100,7 @@ else:
 	CodeGenomes('CutFile.txt')
 
 # #Change N to 100 when deployed
-subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '1', 'Coded.txt', './'])
+subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded.txt', './'])
 
 #Import Silix output
 clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
