@@ -84,13 +84,24 @@ def ExtractTitulars(cytofile, fastafile, yn):
 	#y = yes, only keep proteins that make connections
 	#n = no, keep all proteins
 	if yn == True:
-		df = df[df.duplicated(subset=['ProteinCluster'], keep='first')]
+		df1 = df[df.duplicated(subset=['ProteinCluster'], keep='first')]
+		proteins1 = df1['ProteinCluster']
+		proteins1 = proteins1.drop_duplicates(keep='first')
+		outfasta1 = open('ConnectingTitularProteins.fasta', 'a+')
+		for protein in proteins1:
+			fastas = SeqIO.parse(fastafile, "fasta")
+			for fasta in fastas:
+				name, sequence = fasta.id, str(fasta.seq)
+				if name == protein:
+					SeqIO.write(fasta, outfasta, "fasta")
+		outfasta1.close()
+	
 
 	proteins = df['ProteinCluster']
 
 	proteins = proteins.drop_duplicates(keep='first')
 
-	outfasta = open('TitularProteins.fasta', 'a+')
+	outfasta = open('AllTitularProteins.fasta', 'a+')
 
 	for protein in proteins:
 		fastas = SeqIO.parse(fastafile, "fasta")
@@ -99,3 +110,4 @@ def ExtractTitulars(cytofile, fastafile, yn):
 			if name == protein:
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
+
