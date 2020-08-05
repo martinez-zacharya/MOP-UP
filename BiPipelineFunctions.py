@@ -111,3 +111,20 @@ def ExtractTitulars(cytofile, fastafile, yn):
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
 
+def ExtractSingletons(clustfile, fastafile):
+	silix = pandas.read_csv(clustfile, delimiter = '	', names = ['ProteinCluster', 'Gene'])
+
+	silix = silix.drop_duplicates(subset='ProteinCluster', keep = False)
+
+	proteins = silix['Gene']
+
+	outfasta = open('Singletons.fasta', 'a+')
+
+	for protein in proteins:
+		fastas = SeqIO.parse(fastafile, "fasta")
+		for fasta in fastas:
+			name, sequence = fasta.id, str(fasta.seq)
+			if name == protein:
+				SeqIO.write(fasta, outfasta, "fasta")
+	outfasta.close()
+
