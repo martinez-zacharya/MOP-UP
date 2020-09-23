@@ -3,7 +3,7 @@ import os
 import pandas
 import subprocess
 import infomap
-from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies
+from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies, ExtractSubgroupMembers
 from pyfiglet import Figlet
 from PyInquirer import prompt
 from pprint import pprint
@@ -201,9 +201,11 @@ clustdf = clustdf.drop_duplicates(subset='ProteinCluster', keep='first', inplace
 df6 = df5.merge(clustdf, how='left', left_on='Cluster', right_on='ProteinCluster')
 df6 = df6.drop(columns=['ProteinCluster', 'Cluster'])
 clustdf['Annot'] = 'ProtCluster'
+clustdf = clustdf.drop(columns = ['ProteinCluster'])
+clustdf.to_csv(outputpath + runname + 'CytoscapeHelper.csv',index = None, sep=',', mode='w', header=['Protein', 'Annotation'])
 df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
-subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv'])
+subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv', 'Coded.clu', 'Coded.txt', 'CutFile.txt', 'allvall.csv', 'db.dmnd'])
 
 path = os.path.abspath(os.getcwd())
 
@@ -212,6 +214,11 @@ clustpath = str(path) + '/clusteroutput.txt'
 os.rename(clustpath, outputpath+'clusteroutput.txt')
 
 os.chdir(outputpath)
+
+#SubgroupMembers
+subprocess.run(['mkdir', 'SubgroupMemberLists'])
+outdir = outputpath + 'SubgroupMemberLists/'
+ExtractSubgroupMembers(runname+'Master.csv', outdir)
 
 #titularproteins
 ExtractTitulars(outputpath+runname+'ForCytoscape.csv', fasta, connect)

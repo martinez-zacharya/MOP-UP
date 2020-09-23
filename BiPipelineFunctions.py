@@ -93,7 +93,7 @@ def ExtractTitulars(cytofile, fastafile, yn):
 			for fasta in fastas:
 				name, sequence = fasta.id, str(fasta.seq)
 				if name == protein:
-					SeqIO.write(fasta, outfasta, "fasta")
+					SeqIO.write(fasta, outfasta1, "fasta")
 		outfasta1.close()
 	
 
@@ -128,3 +128,21 @@ def ExtractSingletons(clustfile, fastafile):
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
 
+def ExtractSubgroupMembers(masterfile, outfolder):
+	df = pandas.read_csv(masterfile)
+	grouped = df.groupby(df.Subgroup)
+
+	subgroups = df['Subgroup']
+
+	subgroups = subgroups.drop_duplicates(keep='first')
+
+	for subgroup in subgroups:
+		subgroupname = str(subgroup)
+		entiresubgroup = grouped.get_group(subgroup).reset_index()
+		if len(entiresubgroup.index) == 1:
+			pass
+		else:
+			newfile = open(outfolder + subgroupname + '.txt', 'a+')
+			for ind in entiresubgroup.index:
+				newfile.write(entiresubgroup['Genome'][ind] + '\n')
+			newfile.close()
