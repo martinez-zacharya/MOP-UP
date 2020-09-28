@@ -10,7 +10,7 @@ from pprint import pprint
 
 
 f = Figlet(font='slant')
-print (f.renderText('Bipartite Pipeline'))
+print (f.renderText('MicroPipe'))
 
 questions = [
 
@@ -77,15 +77,30 @@ threads = answers['diamondthreads']
 outputpath = answers['outputfolder']
 connect = answers['connect']
 
+database = open('20200914.fasta', 'r')
+inputfasta = open(fasta, 'r')
+finalfasta = open('final.fasta', 'a+')
+lines1 = inputfasta.readlines()
+for line in lines1:
+	finalfasta.write(line)
+lines2 = database.readlines()
+for line in lines2:
+	finalfasta.write(line)
 
-subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "makedb", "--in", fasta, "-d", "db"])
-subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", fasta,"-o", "allvall.csv", "-p", threads])
+finalfasta.close()
+database.close()
+inputfasta.close()
+
+final = '/stor/work/Ochman/ZMart/BipartitePipeline/final.fasta'
+
+subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "makedb", "--in", final, "-d", "db"])
+subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", threads])
 
 outputpath = outputpath + "/output"
 
 with open('clusteroutput.txt', 'w') as file:
 	subprocess.run(["mkdir", outputpath])
-	subprocess.run(["/stor/home/zam425/bin/silix", "-i", minimumidentity, "-r", minimumoverlap, fasta, "allvall.csv"], stdout = file)
+	subprocess.run(["/stor/home/zam425/bin/silix", "-i", minimumidentity, "-r", minimumoverlap, final, "allvall.csv"], stdout = file)
 
 outputog = outputpath
 
@@ -221,10 +236,10 @@ outdir = outputpath + 'SubgroupMemberLists/'
 ExtractSubgroupMembers(runname+'Master.csv', outdir)
 
 #titularproteins
-ExtractTitulars(outputpath+runname+'ForCytoscape.csv', fasta, connect)
+ExtractTitulars(outputpath+runname+'ForCytoscape.csv', final, connect)
 
 #ProteinFamilies
 subprocess.run(['mkdir', 'ProteinFamilies'])
 outfolder = outputpath + 'ProteinFamilies/'
-ExtractFamilies('clusteroutput.txt', runname+'ForCytoscape.csv', fasta, outfolder)
+ExtractFamilies('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder)
 
