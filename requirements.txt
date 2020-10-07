@@ -1,6 +1,0 @@
-wheel
-pandas
-subprocess.run
-infomap
-pyfiglet
-PyInquirer
