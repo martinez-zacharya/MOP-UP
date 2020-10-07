@@ -3,6 +3,8 @@ import os
 import pandas
 import subprocess
 import infomap
+import argparse
+import sys
 from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies, ExtractSubgroupMembers
 from pyfiglet import Figlet
 from PyInquirer import prompt
@@ -12,70 +14,70 @@ from pprint import pprint
 f = Figlet(font='slant')
 print (f.renderText('MicroPipe'))
 
-questions = [
 
-	{
-		'type': 'input',
-		'name': 'nameofrun',
-		'message': 'Please enter the name of the run'
+parser = argparse.ArgumentParser(prog = 'MicroPipe',
+								description="Run MicroPipe",
+								epilog = "Enjoy the program!")
 
-	},
-	{
-		'type': 'input',
-		'name': 'fasta',
-		'message': 'Please enter path to file for the fasta file'
+parser.add_argument('nameofrun',
+					help='Name of the run',
+					action='store')
 
-	},
-	{
-		'type': 'input',
-		'name': 'delimiter',
-		'message': 'Please enter delimiter between genome and gene in fasta file'
-	},
-	{
-		'type': 'input',
-		'name': 'miniden',
-		'message': 'Please enter minimum percent identity to accept blast hits \n for building families, or press enter to use default of 35%',
-		'default': '.35'
-	},
-	{
-		'type': 'input',
-		'name': 'minover',
-		'message': 'Please enter minimum percent overlap to accept blast hits \n for building familes, or press enter to use default of 80%',
-		'default': '.8'
-	},
-	{
-		'type': 'confirm',
-		'name': 'singleton',
-		'message': 'Do you wish to remove singletons?'
-	},
-	{
-		'type': 'input',
-		'name': 'diamondthreads',
-		'message': 'Please enter number of threads you want to use for Diamond'
-	},
-	{
-		'type': 'input',
-		'name': 'outputfolder',
-		'message': 'Please enter full path of output folder'
-	},
-	{
-		'type': 'confirm',
-		'name': 'connect',
-		'message': 'Do you wish to only keep proteins that make connections in the output?'
-	}
-]
+parser.add_argument('fasta',
+					help='Enter full path to fasta file',
+					action='store')
 
-answers = prompt(questions)
+parser.add_argument('delimiter',
+					help='Delimiter between genome and gene in fasta',
+					action='store')
 
-fasta = answers['fasta']
-delim = answers['delimiter']
-minimumidentity = answers['miniden']
-minimumoverlap = answers['minover']
-sinless = answers['singleton']
-runname = answers['nameofrun']
-threads = answers['diamondthreads']
-outputpath = answers['outputfolder']
-connect = answers['connect']
+parser.add_argument('--miniden',
+					help='Minimum percent identity to accept blast hits for building families. Default is 35%.',
+					action='store',
+					default= .35,
+					dest='miniden')
+
+parser.add_argument('--minover',
+					help='Minimum percent overlap to accept blast hits for building families. Default is 80%.',
+					action='store',
+					default= .8,
+					dest='minover')
+
+parser.add_argument('singleton',
+					help='Type y to remove singletons, type n to keep them',
+					action='store')
+
+parser.add_argument('--cpu',
+					help='Enter how many threads for diamond to use',
+					action='store',
+					default= 1,
+					dest='diamondthreads')
+
+parser.add_argument('connect',
+					help='Type y to keep only proteins that make connections in the output, type n to keep them all',
+					action='store')
+
+parser.add_argument('outputfolder',
+					help='Enter full path to output directory',
+					action='store')
+
+args = parser.parse_args()
+
+fasta = args.fasta
+delim = args.delimiter
+minimumidentity = str(args.miniden)
+minimumoverlap = str(args.minover)
+sinless = args.singleton
+runname = args.nameofrun
+threads = str(args.diamondthreads)
+outputpath = args.outputfolder
+
+if args.connect == 'y':
+	connect = True
+else:
+	connect = False
+
+
 
 database = open('20200914.fasta', 'r')
 inputfasta = open(fasta, 'r')
@@ -94,7 +96,7 @@ inputfasta.close()
 final = '/stor/work/Ochman/ZMart/BipartitePipeline/final.fasta'
 
 subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "makedb", "--in", final, "-d", "db"])
-subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", threads])
+subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads'])
 
 outputpath = outputpath + "/output"
 
@@ -108,7 +110,7 @@ outputpath = outputpath + '/'
 
 CutToGenome('clusteroutput.txt', delim)
 
-if answers['singleton'] == True:
+if args.singleton == 'y':
 	RemoveSingletons('CutFile.txt')
 	CodeGenomes('CutFileSinless.txt')
 else:
@@ -127,7 +129,7 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
 # Import Silix data that has genomes to protein clusters
-if answers['singleton'] == True:
+if args.singleton == 'y':
 	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
 else:
 	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
