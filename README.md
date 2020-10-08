@@ -22,6 +22,7 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 3. You need a protein fasta file with no spaces in the sequence names, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "=". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
 
 	Ex. >GCA_010101_weight=1.5
+	
 	    >GCA_010101_weight=2.9
 
 
@@ -41,4 +42,5 @@ There are several optional arguments you can add, which include
 	3. --cpu Number of threads you want Diamond to use
 	
 An example command
+
 ```$ python3 BipartitePipeline.py TestRun /stor/home/Proteomes.fasta = y n /stor/work/TestRunOutput --cpu 12```
