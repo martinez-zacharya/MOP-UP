@@ -8,6 +8,7 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 1. This has only been run on Ubuntu, however it might still be able to run on other Linux distros and MacOS.
 
 2. You need to install various things including
+
   	1. If using Ubuntu (you should be), build-essential (sudo apt-get install build-essential)
   	2. SiLiX http://lbbe.univ-lyon1.fr/-SiLiX-?lang=en
   	3. Diamond http://www.diamondsearch.org/index.php?pages/installation/
@@ -26,17 +27,19 @@ So this "pipeline" is still pretty ugly, hacky, and not terribly efficient, but 
 
 **RUNNING**
 
-To run, first make sure that diamond is in the file you are currently in, as well as the python scripts that come with the package. The required parameters are - 
+To run, first make sure that diamond is in the file you are currently in, as well as the python scripts that come with the package. The required parameters are
+
 	1. Name of the run
 	2. The full path to your protein fasta file
 	3. The delimiter that separates the cutoff between Genome and Gene, such as =
-	4. Type y or n depending on if you want to remove singleton protein clusters from the 		bipartite network
-	5. Type y or n depending on if you want the output to only contain protein clusters that 	 connect to other protein clusters through a subgroup
+	4. Type y or n depending on if you want to remove singleton protein clusters from the 	bipartite network
+	5. Type y or n depending on if you want the output to only contain protein clusters that connect to other protein clusters through a subgroup
 	6. The full path to your desired output directory
 	
-There are several optional arguments you can add, which include -
-	1. --miniden Minimum percent identity to accept blast hits for building families. Default is	    35%
-	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 	    80%
+There are several optional arguments you can add, which include
+
+	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35%
+	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 80%
 	3. --cpu Number of threads you want Diamond to use
 	
 An example command
