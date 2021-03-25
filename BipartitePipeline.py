@@ -4,20 +4,20 @@ import pandas
 import subprocess
 import infomap
 import argparse
+import multiprocessing
 import sys
 from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies, ExtractSubgroupMembers
 from pyfiglet import Figlet
-from PyInquirer import prompt
-from pprint import pprint
+from time import process_time
+#from pprint import pprint
 
 
-f = Figlet(font='slant')
+f = Figlet(font='speed')
+ff = Figlet(font='doh')
 print (f.renderText('MicroPipe'))
 
 
-parser = argparse.ArgumentParser(prog = 'MicroPipe',
-								description="Run MicroPipe",
-								epilog = "Enjoy the program!")
+parser = argparse.ArgumentParser()
 
 parser.add_argument('nameofrun',
 					help='Name of the run',
@@ -32,34 +32,51 @@ parser.add_argument('delimiter',
 					action='store')
 
 parser.add_argument('--miniden',
-					help='Minimum percent identity to accept blast hits for building families. Default is 35%.',
+					help='Minimum percent identity to accept blast hits for building families. Default is 0.35',
 					action='store',
 					default= .35,
 					dest='miniden')
 
 parser.add_argument('--minover',
-					help='Minimum percent overlap to accept blast hits for building families. Default is 80%.',
+					help='Minimum percent overlap to accept blast hits for building families. Default is 0.80',
 					action='store',
 					default= .8,
 					dest='minover')
 
-parser.add_argument('singleton',
-					help='Type y to remove singletons, type n to keep them',
-					action='store')
+parser.add_argument('--singleton',
+					help='Add this flag to remove singletons',
+					action='store_true')
 
 parser.add_argument('--cpu',
 					help='Enter how many threads for diamond to use',
 					action='store',
 					default= 1,
 					dest='diamondthreads')
+parser.add_argument('--iter',
+					help='Enter how many infomap iterations to run',
+					action='store',
+					default=1000,
+					dest='iters')
 
-parser.add_argument('connect',
-					help='Type y to keep only proteins that make connections in the output, type n to keep them all',
-					action='store')
+parser.add_argument('--connect',
+					help='Add this flag to keep only proteins that make connections in the output',
+					action='store_true')
 
 parser.add_argument('outputfolder',
 					help='Enter full path to output directory',
 					action='store')
+
+parser.add_argument('--db',
+					help = 'Type n to not use preexisting microviridae database in analysis',
+					action = 'store',
+					default = 'y',
+					dest = 'dbcheck')
+
+parser.add_argument('--extra',
+					help = 'Add this flag to command MicroPipe to do extra stuffs',
+					action = 'store_true',
+					dest = 'extra')
+
 
 args = parser.parse_args()
 
@@ -71,29 +88,28 @@ sinless = args.singleton
 runname = args.nameofrun
 threads = str(args.diamondthreads)
 outputpath = args.outputfolder
+db = args.dbcheck
+infoiters = str(args.iters)
 
-if args.connect == 'y':
-	connect = True
+
+if db == 'y':
+	database = open('20210303.fasta', 'r')
+	inputfasta = open(fasta, 'r')
+	finalfasta = open('final.fasta', 'a+')
+	lines1 = inputfasta.readlines()
+	for line in lines1:
+		finalfasta.write(line)
+	lines2 = database.readlines()
+	for line in lines2:
+		finalfasta.write(line)
+
+	finalfasta.close()
+	database.close()
+	inputfasta.close()
+
+	final = '/stor/work/Ochman/ZMart/BipartitePipeline/final.fasta'
 else:
-	connect = False
-
-
-
-database = open('20200914.fasta', 'r')
-inputfasta = open(fasta, 'r')
-finalfasta = open('final.fasta', 'a+')
-lines1 = inputfasta.readlines()
-for line in lines1:
-	finalfasta.write(line)
-lines2 = database.readlines()
-for line in lines2:
-	finalfasta.write(line)
-
-finalfasta.close()
-database.close()
-inputfasta.close()
-
-final = '/stor/work/Ochman/ZMart/BipartitePipeline/final.fasta'
+	final = fasta
 
 subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "makedb", "--in", final, "-d", "db"])
 subprocess.run(["/stor/work/Ochman/ZMart/BipartitePipeline/./diamond", "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads'])
@@ -110,14 +126,13 @@ outputpath = outputpath + '/'
 
 CutToGenome('clusteroutput.txt', delim)
 
-if args.singleton == 'y':
+if args.singleton == True:
 	RemoveSingletons('CutFile.txt')
 	CodeGenomes('CutFileSinless.txt')
 else:
 	CodeGenomes('CutFile.txt')
 
-# #Change N to 100 when deployed
-subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', '100', 'Coded.txt', './'])
+subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', infoiters, '-s', '1', 'Coded.txt', './'])
 
 #Import Silix output
 clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
@@ -129,7 +144,7 @@ df2 = pandas.read_csv('Coded.clu', delimiter = ' ', names = ["A", "B", "C"], com
 df1 = pandas.read_csv('Coded.txt', delimiter = ' ', names = ["A", "B"])
 
 # Import Silix data that has genomes to protein clusters
-if args.singleton == 'y':
+if args.singleton == True:
 	decodedf = pandas.read_csv('CutFileSinless.txt', delimiter = ' ', names = ["Genome","Cluster"])
 else:
 	decodedf = pandas.read_csv('CutFile.txt', delimiter = ' ', names = ["Genome","Cluster"])
@@ -222,7 +237,7 @@ clustdf = clustdf.drop(columns = ['ProteinCluster'])
 clustdf.to_csv(outputpath + runname + 'CytoscapeHelper.csv',index = None, sep=',', mode='w', header=['Protein', 'Annotation'])
 df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
-subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv', 'Coded.clu', 'Coded.txt', 'CutFile.txt', 'allvall.csv', 'db.dmnd'])
+subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv', 'Coded.clu', 'Coded.txt', 'CutFile.txt', 'CutFileSinless.txt', 'allvall.csv', 'db.dmnd'])
 
 path = os.path.abspath(os.getcwd())
 
@@ -232,16 +247,39 @@ os.rename(clustpath, outputpath+'clusteroutput.txt')
 
 os.chdir(outputpath)
 
-#SubgroupMembers
-subprocess.run(['mkdir', 'SubgroupMemberLists'])
-outdir = outputpath + 'SubgroupMemberLists/'
-ExtractSubgroupMembers(runname+'Master.csv', outdir)
+if args.extra == True:
+	subprocess.run(['mkdir', 'SubgroupMemberLists'])
+	outdir = outputpath + 'SubgroupMemberLists/'
+	subprocess.run(['mkdir', 'ProteinFamilies'])
+	outfolder = outputpath + 'ProteinFamilies/'
 
-#titularproteins
-ExtractTitulars(outputpath+runname+'ForCytoscape.csv', final, connect)
 
-#ProteinFamilies
-subprocess.run(['mkdir', 'ProteinFamilies'])
-outfolder = outputpath + 'ProteinFamilies/'
-ExtractFamilies('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder)
+	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
+	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect))
+	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder))
+	
+	p1.start()
+	p2.start()
+	p3.start()
 
+	p1.join()
+	p2.join()
+	p3.join()
+
+	#SubgroupMembers
+	#subprocess.run(['mkdir', 'SubgroupMemberLists'])
+	#outdir = outputpath + 'SubgroupMemberLists/'
+	#ExtractSubgroupMembers(runname+'Master.csv', outdir)
+
+	#titularproteins
+	#ExtractTitulars(outputpath+runname+'ForCytoscape.csv', final, args.connect)
+
+
+	#ProteinFamilies
+	#subprocess.run(['mkdir', 'ProteinFamilies'])
+	#outfolder = outputpath + 'ProteinFamilies/'
+	#ExtractFamilies('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder)
+
+	print (ff.renderText('Fin!'))
+else:
+	print (ff.renderText('Fin!'))

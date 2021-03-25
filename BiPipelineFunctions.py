@@ -1,6 +1,8 @@
 import os
 import pandas
 from Bio import SeqIO
+from pyfaidx import Fasta
+
 
 def CutToGenome(file, delimiter):
 	f = open(file, "r")
@@ -43,6 +45,8 @@ def CodeGenomes(file):
 	n.close()
 
 def ExtractFamilies(clustfile, cytofile, fastafile, outfolder):
+	sequences = Fasta(fastafile)
+
 	silix = pandas.read_csv(clustfile, delimiter = '	', names = ['ProteinCluster', 'Gene'])
 
 	cyto = pandas.read_csv(cytofile)
@@ -65,20 +69,17 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder):
 
 	clustlist = clustname['ProteinCluster_x'].tolist()
 
-
 	for clust in clustlist:
 		newfile = open(outfolder + str(clust)+'.fasta', 'a+')
 		snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
 		snippeddf = snippeddf.reset_index(drop=True)
 		for i in range(len(snippeddf)):
-			fasta_sequences = SeqIO.parse(fastafile, "fasta")
-			for fasta in fasta_sequences:
-				name, sequence = fasta.id, str(fasta.seq)
-				if str(clust) == snippeddf.loc[i, "ProteinCluster_x"] and name == snippeddf.loc[i, "Gene_y"]:
-					SeqIO.write(fasta, newfile, "fasta")
+			newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(sequences[snippeddf.loc[i, "Gene_y"]][0:]) + '\n')
 		newfile.close()
 
 def ExtractTitulars(cytofile, fastafile, yn):
+	sequences = Fasta(fastafile)
+
 	df = pandas.read_csv(cytofile)
 
 	#y = yes, only keep proteins that make connections
@@ -89,11 +90,7 @@ def ExtractTitulars(cytofile, fastafile, yn):
 		proteins1 = proteins1.drop_duplicates(keep='first')
 		outfasta1 = open('ConnectingTitularProteins.fasta', 'a+')
 		for protein in proteins1:
-			fastas = SeqIO.parse(fastafile, "fasta")
-			for fasta in fastas:
-				name, sequence = fasta.id, str(fasta.seq)
-				if name == protein:
-					SeqIO.write(fasta, outfasta1, "fasta")
+			outfasta1.write('>' + str(protein) + '\n' + str(sequences[protein][0:])+'\n')
 		outfasta1.close()
 	
 
@@ -104,11 +101,7 @@ def ExtractTitulars(cytofile, fastafile, yn):
 	outfasta = open('AllTitularProteins.fasta', 'a+')
 
 	for protein in proteins:
-		fastas = SeqIO.parse(fastafile, "fasta")
-		for fasta in fastas:
-			name, sequence = fasta.id, str(fasta.seq)
-			if name == protein:
-				SeqIO.write(fasta, outfasta, "fasta")
+		outfasta.write('>' + str(protein) + '\n' + str(sequences[protein][0:]) + '\n')
 	outfasta.close()
 
 def ExtractSingletons(clustfile, fastafile):

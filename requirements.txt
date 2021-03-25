@@ -1,0 +1,6 @@
+pandas
+subprocess.run
+infomap
+pyfiglet
+biopython
+pyfaidx
