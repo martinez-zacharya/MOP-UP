@@ -195,7 +195,9 @@ clustdf = clustdf.drop(columns = ['ProteinCluster'])
 clustdf.to_csv(outputpath + runname + 'CytoscapeHelper.csv',index = None, sep=',', mode='w', header=['Protein', 'Annotation'])
 df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
-subprocess.run(['rm', 'prelim50MagsHumanProTest.csv', 'GroupedMagsHumanProTest.csv', 'Coded.clu', 'Coded.txt', 'CutFile.txt', 'CutFileSinless.txt', 'allvall.csv', 'db.dmnd'])
+subprocess.run(['rm', 'Coded.clu', 'Coded.txt', 'CutFile.txt','allvall.csv', 'db.dmnd'])
+if args.singleton == True:
+	subprocess.run(['rm', 'CutFileSinless.txt'])
 
 path = os.path.abspath(os.getcwd())
 
