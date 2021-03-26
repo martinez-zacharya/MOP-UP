@@ -69,7 +69,7 @@ parser.add_argument('--db',
 					default = 'y',
 					dest = 'dbcheck')
 
-parser.add_argument('--extra',
+#parser.add_argument('--extra',
 					help = 'Add this flag to command MicroPipe to do extra stuffs',
 					action = 'store_true',
 					dest = 'extra')
@@ -207,25 +207,22 @@ os.rename(clustpath, outputpath+'clusteroutput.txt')
 
 os.chdir(outputpath)
 
-if args.extra == True:
-	subprocess.run(['mkdir', 'SubgroupMemberLists'])
-	outdir = outputpath + 'SubgroupMemberLists/'
-	subprocess.run(['mkdir', 'ProteinFamilies'])
-	outfolder = outputpath + 'ProteinFamilies/'
+subprocess.run(['mkdir', 'SubgroupMemberLists'])
+outdir = outputpath + 'SubgroupMemberLists/'
+subprocess.run(['mkdir', 'ProteinFamilies'])
+outfolder = outputpath + 'ProteinFamilies/'
 
 
-	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
-	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect))
-	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder))
+p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
+p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect))
+p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder))
 	
-	p1.start()
-	p2.start()
-	p3.start()
+p1.start()
+p2.start()
+p3.start()
 
-	p1.join()
-	p2.join()
-	p3.join()
+p1.join()
+p2.join()
+p3.join()
 
-	print (ff.renderText('Fin!'))
-else:
-	print (ff.renderText('Fin!'))
+print (ff.renderText('Fin!'))
