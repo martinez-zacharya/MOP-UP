@@ -18,8 +18,10 @@ Version : 0.9.1
 
 5. You need a protein fasta file with no spaces in the sequence names, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "=". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
 
-	Ex. >GCA_010101_@Peptidase2
-	    MEKLKALLTSKKFWTLVAAIVAALT
+> \>ClusterI_0_SCPE01000001_Alistipes_sp@gene_000001
+> MEKLKALLTSKKFWTLVAAIVAALTAFFTTSCTGYLKFRREGVHHDTVRYEQVIKHKNYSAWLSNQIDRSSWRRPMMLSVCSSGTAFLSRSSGVSISSYLISPPLIHSVLPSILSSSINSVSFITLNRNCLEQITPLFTSNLPKRKSLGVCLALMMIGVPLSRVSPSSLDERRRGGRKGRPRPKIRNIPIGGSHL
+
+
 
 
 **RUNNING**
