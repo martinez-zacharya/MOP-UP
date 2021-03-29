@@ -44,8 +44,8 @@ def CodeGenomes(file):
 	f.close()
 	n.close()
 
-def ExtractFamilies(clustfile, cytofile, fastafile, outfolder):
-	sequences = Fasta(fastafile)
+def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
+	#sequences = Fasta(fastafile)
 
 	silix = pandas.read_csv(clustfile, delimiter = '	', names = ['ProteinCluster', 'Gene'])
 
@@ -74,11 +74,12 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder):
 		snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
 		snippeddf = snippeddf.reset_index(drop=True)
 		for i in range(len(snippeddf)):
-			newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(sequences[snippeddf.loc[i, "Gene_y"]][0:]) + '\n')
+			newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]) + '\n')
+			#print('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]))
 		newfile.close()
 
-def ExtractTitulars(cytofile, fastafile, yn):
-	sequences = Fasta(fastafile)
+def ExtractTitulars(cytofile, fastafile, yn, fastafai):
+	#sequences = Fasta(fastafile)
 
 	df = pandas.read_csv(cytofile)
 
@@ -90,7 +91,7 @@ def ExtractTitulars(cytofile, fastafile, yn):
 		proteins1 = proteins1.drop_duplicates(keep='first')
 		outfasta1 = open('ConnectingTitularProteins.fasta', 'a+')
 		for protein in proteins1:
-			outfasta1.write('>' + str(protein) + '\n' + str(sequences[protein][0:])+'\n')
+			outfasta1.write('>' + str(protein) + '\n' + str(fastafai[protein][0:])+'\n')
 		outfasta1.close()
 	
 
@@ -101,7 +102,7 @@ def ExtractTitulars(cytofile, fastafile, yn):
 	outfasta = open('AllTitularProteins.fasta', 'a+')
 
 	for protein in proteins:
-		outfasta.write('>' + str(protein) + '\n' + str(sequences[protein][0:]) + '\n')
+		outfasta.write('>' + str(protein) + '\n' + str(fastafai[protein][0:]) + '\n')
 	outfasta.close()
 
 def ExtractSingletons(clustfile, fastafile):

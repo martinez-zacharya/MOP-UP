@@ -11,12 +11,13 @@ Version : 0.9.1
 
   	1. If using Ubuntu, build-essential ```$ sudo apt-get install build-essential```
   	2. SiLiX (http://lbbe.univ-lyon1.fr/-SiLiX-?lang=en)
+		1. Make sure to place the silix file into the same directory as BipartitePipeline.py and make it exectuable
 	3. Miniconda (https://docs.conda.io/en/latest/miniconda.html)
 
 4. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
 
 
-5. You need a protein fasta file with no spaces in the sequence names, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "=". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
+5. You need a protein fasta file with no spaces in the sequence names, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "@". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
 
 > \>ClusterI_0_SCPE01000001_Alistipes_sp@gene_000001
 > MEKLKALLTSKKFWTLVAAIVAALTAFFTTSCTGYLKFRREGVHHDTVRYEQVIKHKNYSAWLSNQIDRSSWRRPMMLSVCSSGTAFLSRSSGVSISSYLISPPLIHSVLPSILSSSINSVSFITLNRNCLEQITPLFTSNLPKRKSLGVCLALMMIGVPLSRVSPSSLDERRRGGRKGRPRPKIRNIPIGGSHL
@@ -38,7 +39,7 @@ There are several optional arguments you can add, which include
 	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35%
 	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 80%
 	3. --cpu Number of threads you want Diamond to use
-	4. --db Whether or not you want to use our curated Microviridae database
+	4. --noDB By adding this argument, you can elect to leave out the Microviridae database from the analysis
 	5. --singleton Add this flag to remove singletons
 	6. --iter How many infomap iterations to run
 	7. --connect Add this flag to keep only proteins that make connections in the output

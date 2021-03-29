@@ -7,6 +7,7 @@ import multiprocessing
 from BiPipelineFunctions import CutToGenome, RemoveSingletons,CodeGenomes, ExtractTitulars, ExtractFamilies, ExtractSubgroupMembers
 from pyfiglet import Figlet
 from time import process_time
+from pyfaidx import Fasta
 
 
 if __name__ == "__main__":
@@ -65,10 +66,9 @@ if __name__ == "__main__":
 						help='Enter full path to output directory',
 						action='store')
 
-	parser.add_argument('--db',
-						help = 'Type n to not use preexisting microviridae database in analysis',
-						action = 'store',
-						default = 'y',
+	parser.add_argument('--noDB',
+						help = 'Add flag to not use included Microviridae database',
+						action='store_true',
 						dest = 'dbcheck')
 
 
@@ -85,25 +85,31 @@ if __name__ == "__main__":
 	db = args.dbcheck
 	infoiters = str(args.iters)
 
+	workingDirectory = os.getcwd()
 
-	if db == 'y':
-		database = open('20210303.fasta', 'r')
-		inputfasta = open(fasta, 'r')
-		finalfasta = open('final.fasta', 'a+')
-		lines1 = inputfasta.readlines()
-		for line in lines1:
-			finalfasta.write(line)
-		lines2 = database.readlines()
-		for line in lines2:
-			finalfasta.write(line)
+	if db == False:
+		with open('final.fasta', 'w') as file:
+			subprocess.run(['cat', '20210303.fasta', fasta], stdout = file)
+		#database = open('20210303.fasta', 'r')
+		#inputfasta = open(fasta, 'r')
+		#finalfasta = open('final.fasta', 'a+')
+		#lines1 = inputfasta.readlines()
+		#for line in lines1:
+		#	finalfasta.write(line)
+		#lines2 = database.readlines()
+		#for line in lines2:
+		#	finalfasta.write(line)
 
-		finalfasta.close()
-		database.close()
-		inputfasta.close()
+		file.close()
+		#database.close()
+		#inputfasta.close()
 
 		final = str(os.getcwd()) + '/final.fasta'
 	else:
-		final = fasta
+		with open('final.fasta', 'w') as finalfile:
+			subprocess.run(['cat', fasta], stdout = finalfile)
+		finalfile.close()
+		final = str(os.getcwd()) + '/final.fasta'
 
 	diamondcmd = str(os.getcwd()) + '/./diamond'
 	silixcmd = str(os.getcwd()) + '/silix'
@@ -209,10 +215,10 @@ if __name__ == "__main__":
 	subprocess.run(['mkdir', 'ProteinFamilies'])
 	outfolder = outputpath + 'ProteinFamilies/'
 
-
+	fastafai = Fasta(final)
 	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
-	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect))
-	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder))
+	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect, fastafai))
+	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
 	p1.start()
 	p2.start()
@@ -222,4 +228,6 @@ if __name__ == "__main__":
 	p2.join()
 	p3.join()
 
+	os.chdir(workingDirectory)
+	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai'])
 	print (ff.renderText('Fin!'))
