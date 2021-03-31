@@ -2,3 +2,4 @@
 - more options for silix/diamond available as flags/added into readme
 - describe default settings in readme (for example number of iterations)
 - figure out actual requirements for install
+- option to run without input file
