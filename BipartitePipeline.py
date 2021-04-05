@@ -70,6 +70,16 @@ if __name__ == "__main__":
 						help = 'Add flag to not use included Microviridae database',
 						action='store_true',
 						dest = 'dbcheck')
+	parser.add_argument('--block-size',
+						help = "Change Diamond Search block size to increase performance. Default is 2",
+						action = 'store',
+						default = 2,
+						dest = 'block')
+	parser.add_argument('--sensitivity',
+						help = "Tune alignment sensitivity for Diamond. Choose between mid-sensitive, sensitive, more-sensitive, very-sensitive, and ultra-sensitive.",
+						action = "store",
+						default = False,
+						dest = 'DiamondSens')
 
 
 	args = parser.parse_args()
@@ -84,25 +94,20 @@ if __name__ == "__main__":
 	outputpath = args.outputfolder
 	db = args.dbcheck
 	infoiters = str(args.iters)
+	blocksize = str(args.block)
+	if args.DiamondSens != False:
+		dmndsens = '--' + str(args.DiamondSens)
+	else:
+		dmndsens = args.DiamondSens
+
+	blockarg = '-b' + blocksize
 
 	workingDirectory = os.getcwd()
 
 	if db == False:
 		with open('final.fasta', 'w') as file:
 			subprocess.run(['cat', '20210303.fasta', fasta], stdout = file)
-		#database = open('20210303.fasta', 'r')
-		#inputfasta = open(fasta, 'r')
-		#finalfasta = open('final.fasta', 'a+')
-		#lines1 = inputfasta.readlines()
-		#for line in lines1:
-		#	finalfasta.write(line)
-		#lines2 = database.readlines()
-		#for line in lines2:
-		#	finalfasta.write(line)
-
 		file.close()
-		#database.close()
-		#inputfasta.close()
 
 		final = str(os.getcwd()) + '/final.fasta'
 	else:
@@ -114,8 +119,14 @@ if __name__ == "__main__":
 	diamondcmd = str(os.getcwd()) + '/./diamond'
 	silixcmd = str(os.getcwd()) + '/silix'
 
+
 	subprocess.run([diamondcmd, "makedb", "--in", final, "-d", "db"], check = True)
-	subprocess.run([diamondcmd, "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads'], check = True)
+
+	if dmndsens == False:
+		subprocess.run([diamondcmd, "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads', blockarg], check = True)
+	else:
+		subprocess.run([diamondcmd, "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads', blockarg, dmndsens], check = True)
+
 
 	outputpath = outputpath + "/output"
 
