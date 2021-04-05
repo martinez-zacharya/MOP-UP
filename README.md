@@ -17,11 +17,14 @@ Version : 0.9.2
 4. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
 
 
-5. You need a protein fasta file with no spaces in the sequence names, as well as a delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. This is incredibly important, don't overlook this! In the example below, the delimiter is "@". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
+5. You need a protein fasta file with 
+	1. No spaces in the headers
+	2. A delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. In the example below, the delimiter is "@". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
 
-> \>ClusterI_0_SCPE01000001_Alistipes_sp@gene_000001
-> MEKLKALLTSKKFWTLVAAIVAALTAFFTTSCTGYLKFRREGVHHDTVRYEQVIKHKNYSAWLSNQIDRSSWRRPMMLSVCSSGTAFLSRSSGVSISSYLISPPLIHSVLPSILSSSINSVSFITLNRNCLEQITPLFTSNLPKRKSLGVCLALMMIGVPLSRVSPSSLDERRRGGRKGRPRPKIRNIPIGGSHL
-
+	> \>ClusterI_0_SCPE01000001_Alistipes_sp@gene_000001
+	> MEKLKALLTSKKFWTLVAAIVAALTAFFTTSCTGYLKFRREGVHHDTVRYEQVIKHKNYSAWLSNQIDRSSWRRPMMLSVCSSGTAFLSRSSGVSISSYLISPPLIHSVLPSILSSSINSVSFITLNRNCLEQITPLFTSNLPKRKSLGVCLALMMIGVPLSRVSPSSLDERRRGGRKGRPRPKIRNIPIGGSHL
+	
+	3. No duplicated gene names
 
 
 
