@@ -1,4 +1,3 @@
- - have the output directories for subgroups, titular proteins include the run name like the other files. otherwise i have to make a new directory for each run i want to do
 - more options for silix/diamond available as flags/added into readme
 - describe default settings in readme (for example number of iterations)
 - figure out actual requirements for install

@@ -210,14 +210,17 @@ if __name__ == "__main__":
 
 	os.chdir(outputpath)
 
-	subprocess.run(['mkdir', 'SubgroupMemberLists'])
-	outdir = outputpath + 'SubgroupMemberLists/'
-	subprocess.run(['mkdir', 'ProteinFamilies'])
-	outfolder = outputpath + 'ProteinFamilies/'
+	SubList = runname + 'SubgroupMemberLists'
+	ProtFam = runname + 'ProteinFamilies'
+
+	subprocess.run(['mkdir', SubList])
+	outdir = outputpath + SubList + '/'
+	subprocess.run(['mkdir', ProtFam])
+	outfolder = outputpath + ProtFam + '/'
 
 	fastafai = Fasta(final)
 	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
-	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect, fastafai))
+	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
 	p1.start()
@@ -228,6 +231,7 @@ if __name__ == "__main__":
 	p2.join()
 	p3.join()
 
+	subprocess.run(['rm', 'clusteroutput.txt'])
 	os.chdir(workingDirectory)
 	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai'])
 	print (ff.renderText('Fin!'))

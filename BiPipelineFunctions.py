@@ -78,7 +78,7 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 			#print('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]))
 		newfile.close()
 
-def ExtractTitulars(cytofile, fastafile, yn, fastafai):
+def ExtractTitulars(cytofile, fastafile, yn, fastafai, nameofrun):
 	#sequences = Fasta(fastafile)
 
 	df = pandas.read_csv(cytofile)
@@ -99,7 +99,7 @@ def ExtractTitulars(cytofile, fastafile, yn, fastafai):
 
 	proteins = proteins.drop_duplicates(keep='first')
 
-	outfasta = open('AllTitularProteins.fasta', 'a+')
+	outfasta = open(str(nameofrun) + 'AllTitularProteins.fasta', 'a+')
 
 	for protein in proteins:
 		outfasta.write('>' + str(protein) + '\n' + str(fastafai[protein][0:]) + '\n')
