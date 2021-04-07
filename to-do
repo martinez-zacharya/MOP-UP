@@ -2,3 +2,4 @@
 - describe default settings in readme (for example number of iterations)
 - figure out actual requirements for install
 - option to run without input file (our database only)
+- have all output files include the name of the run
