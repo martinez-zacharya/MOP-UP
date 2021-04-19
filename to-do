@@ -1,6 +1,2 @@
-- more options for silix/diamond available as flags/added into readme
-- describe default settings in readme (for example number of iterations)
 - figure out actual requirements for install
-- option to run without input file (our database only)
-- have all output files include the name of the run
-- remove --connect flag, always add a specific folder (in addition to the protein and subgroup folders) that has the connecting proteins only 
+

@@ -58,10 +58,6 @@ if __name__ == "__main__":
 						default=1000,
 						dest='iters')
 
-	parser.add_argument('--connect',
-						help='Add this flag to keep only proteins that make connections in the output',
-						action='store_true')
-
 	parser.add_argument('outputfolder',
 						help='Enter full path to output directory',
 						action='store')
@@ -231,7 +227,7 @@ if __name__ == "__main__":
 
 	fastafai = Fasta(final)
 	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
-	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, args.connect, fastafai, runname))
+	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
 	p1.start()

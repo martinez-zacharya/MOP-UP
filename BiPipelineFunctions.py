@@ -78,21 +78,16 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 			#print('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]))
 		newfile.close()
 
-def ExtractTitulars(cytofile, fastafile, yn, fastafai, nameofrun):
-	#sequences = Fasta(fastafile)
-
+def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
 	df = pandas.read_csv(cytofile)
 
-	#y = yes, only keep proteins that make connections
-	#n = no, keep all proteins
-	if yn == True:
-		df1 = df[df.duplicated(subset=['ProteinCluster'], keep='first')]
-		proteins1 = df1['ProteinCluster']
-		proteins1 = proteins1.drop_duplicates(keep='first')
-		outfasta1 = open('ConnectingTitularProteins.fasta', 'a+')
-		for protein in proteins1:
-			outfasta1.write('>' + str(protein) + '\n' + str(fastafai[protein][0:])+'\n')
-		outfasta1.close()
+	df1 = df[df.duplicated(subset=['ProteinCluster'], keep='first')]
+	proteins1 = df1['ProteinCluster']
+	proteins1 = proteins1.drop_duplicates(keep='first')
+	outfasta1 = open(str(nameofrun) + 'ConnectingTitularProteins.fasta', 'a+')
+	for protein in proteins1:
+		outfasta1.write('>' + str(protein) + '\n' + str(fastafai[protein][0:])+'\n')
+	outfasta1.close()
 	
 
 	proteins = df['ProteinCluster']
