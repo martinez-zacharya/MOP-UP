@@ -189,7 +189,12 @@ if __name__ == "__main__":
 	spreadf = spreadf.drop(columns = ["Cluster", "B_y", "B_x", "C", "A_y", "C"])
 	#Drops duplicates
 	spreadf = spreadf.drop_duplicates(keep='first', inplace=False)
-	spreadf.to_csv(outputpath + runname + 'Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup"], index = None, sep=',')
+	#Imports metadata
+	metadata = pandas.read_csv('Metadata.csv')
+	metadata = metadata[['Genome', 'Source', 'Larger_context_source']]
+	spreadf = spreadf.merge(metadata, how = 'left', left_on='Genome_x', right_on='Genome')
+	spreadf = spreadf.drop(columns=['Genome'])
+	spreadf.to_csv(outputpath + runname + 'Master.csv', mode='w', header = ["NetworkID","Genome", "Subgroup", "Source", "Larger_Context_Source"],  index = None, sep=',')
 
 	#For normal cytoscape visualization
 	df5 = df5.drop_duplicates(keep = 'first', inplace=False)
