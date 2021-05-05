@@ -1,5 +1,6 @@
 import os
 import pandas
+import subprocess
 from Bio import SeqIO
 from pyfaidx import Fasta
 
@@ -117,7 +118,8 @@ def ExtractSingletons(clustfile, fastafile):
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
 
-def ExtractSubgroupMembers(masterfile, outfolder):
+def ExtractSubgroupMembers(masterfile, outfolder, fastafile, delim):
+	os.mkdir(outfolder + 'SubgroupMemberTextFiles')
 	df = pandas.read_csv(masterfile)
 	grouped = df.groupby(df.Subgroup)
 
@@ -131,7 +133,21 @@ def ExtractSubgroupMembers(masterfile, outfolder):
 		if len(entiresubgroup.index) == 1:
 			pass
 		else:
-			newfile = open(outfolder + subgroupname + '.txt', 'a+')
+			newfile = open(outfolder + 'SubgroupMemberTextFiles/' + subgroupname + '.txt', 'a+')
 			for ind in entiresubgroup.index:
 				newfile.write(entiresubgroup['Genome'][ind] + '\n')
 			newfile.close()
+
+	os.mkdir(outfolder + 'SubgroupMemberFastaFiles')
+	for subgroup in subgroups:
+		subgroupname = str(subgroup)
+		entiresubgroup = grouped.get_group(subgroup).reset_index()
+		if len(entiresubgroup.index) == 1:
+			pass
+		else:
+			newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
+			for ind in entiresubgroup.index:
+				genome = '^' + entiresubgroup['Genome'][ind] + delim + '.*'
+				subprocess.run(['faidx', fastafile, '-g', genome], stdout = newfile) 
+			newfile.close()
+

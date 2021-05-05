@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
 	if db == False:
 		with open('final.fasta', 'w') as file:
-			subprocess.run(['cat', '20210303.fasta', fasta], stdout = file)
+			subprocess.run(['cat', 'Micro05042021.fasta', fasta], stdout = file)
 		file.close()
 
 		final = str(os.getcwd()) + '/final.fasta'
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 	outfolder = outputpath + ProtFam + '/'
 
 	fastafai = Fasta(final)
-	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir))
+	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, final, delim))
 	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
