@@ -50,7 +50,7 @@ There are several optional arguments you can add, which include
 
 An example command
 
-```$ python3 BipartitePipeline.py TestRun /stor/home/Proteomes.fasta = /stor/work/TestRunOutput --cpu 12```
+```$ python3 BipartitePipeline.py TestRun /stor/home/Proteomes.fasta @ /stor/work/TestRunOutput --cpu 12```
 
 **OUTPUT**
 
