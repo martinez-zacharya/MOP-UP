@@ -1,6 +1,7 @@
 import os
 import pandas
 import subprocess
+import re
 from Bio import SeqIO
 from pyfaidx import Fasta
 
@@ -76,7 +77,6 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 		snippeddf = snippeddf.reset_index(drop=True)
 		for i in range(len(snippeddf)):
 			newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]) + '\n')
-			#print('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]))
 		newfile.close()
 
 def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
@@ -118,7 +118,7 @@ def ExtractSingletons(clustfile, fastafile):
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
 
-def ExtractSubgroupMembers(masterfile, outfolder, fastafile, delim):
+def ExtractSubgroupMembers(masterfile, outfolder, genomefai):
 	os.mkdir(outfolder + 'SubgroupMemberTextFiles')
 	df = pandas.read_csv(masterfile)
 	grouped = df.groupby(df.Subgroup)
@@ -147,7 +147,9 @@ def ExtractSubgroupMembers(masterfile, outfolder, fastafile, delim):
 		else:
 			newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
 			for ind in entiresubgroup.index:
-				genome = '^' + entiresubgroup['Genome'][ind] + delim + '.*'
-				subprocess.run(['faidx', fastafile, '-g', genome], stdout = newfile) 
+				try:
+					newfile.write('>' + str(entiresubgroup['Genome'][ind]) + '\n' + str(genomefai[entiresubgroup['Genome'][ind]][0:]) + '\n')
+				except KeyError:
+					pass
 			newfile.close()
 

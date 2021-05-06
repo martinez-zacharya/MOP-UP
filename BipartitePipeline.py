@@ -114,6 +114,8 @@ if __name__ == "__main__":
 
 	diamondcmd = str(os.getcwd()) + '/./diamond'
 	silixcmd = str(os.getcwd()) + '/silix'
+	genomefai = Fasta('microgenomes_05042021.fasta')
+
 
 
 	subprocess.run([diamondcmd, "makedb", "--in", final, "-d", "db"], check = True)
@@ -231,7 +233,7 @@ if __name__ == "__main__":
 	outfolder = outputpath + ProtFam + '/'
 
 	fastafai = Fasta(final)
-	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, final, delim))
+	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, genomefai))
 	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
@@ -245,5 +247,5 @@ if __name__ == "__main__":
 
 	subprocess.run(['rm', 'clusteroutput.txt'])
 	os.chdir(workingDirectory)
-	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai'])
+	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai', 'microgenomes_05042021.fasta.fai'])
 	print (ff.renderText('Fin!'))
