@@ -118,7 +118,7 @@ def ExtractSingletons(clustfile, fastafile):
 				SeqIO.write(fasta, outfasta, "fasta")
 	outfasta.close()
 
-def ExtractSubgroupMembers(masterfile, outfolder, genomefai):
+def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
 	os.mkdir(outfolder + 'SubgroupMemberTextFiles')
 	df = pandas.read_csv(masterfile)
 	grouped = df.groupby(df.Subgroup)
@@ -138,18 +138,19 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai):
 				newfile.write(entiresubgroup['Genome'][ind] + '\n')
 			newfile.close()
 
-	os.mkdir(outfolder + 'SubgroupMemberFastaFiles')
-	for subgroup in subgroups:
-		subgroupname = str(subgroup)
-		entiresubgroup = grouped.get_group(subgroup).reset_index()
-		if len(entiresubgroup.index) == 1:
-			pass
-		else:
-			newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
-			for ind in entiresubgroup.index:
-				try:
-					newfile.write('>' + str(entiresubgroup['Genome'][ind]) + '\n' + str(genomefai[entiresubgroup['Genome'][ind]][0:]) + '\n')
-				except KeyError:
-					pass
-			newfile.close()
+	if db == False:
+		os.mkdir(outfolder + 'SubgroupMemberFastaFiles')
+		for subgroup in subgroups:
+			subgroupname = str(subgroup)
+			entiresubgroup = grouped.get_group(subgroup).reset_index()
+			if len(entiresubgroup.index) == 1:
+				pass
+			else:
+				newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
+				for ind in entiresubgroup.index:
+					try:
+						newfile.write('>' + str(entiresubgroup['Genome'][ind]) + '\n' + str(genomefai[entiresubgroup['Genome'][ind]][0:]) + '\n')
+					except KeyError:
+						pass
+				newfile.close()
 

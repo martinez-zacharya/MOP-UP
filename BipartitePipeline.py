@@ -62,7 +62,7 @@ if __name__ == "__main__":
 						help='Enter full path to output directory',
 						action='store')
 
-	parser.add_argument('--noDB',
+	parser.add_argument('--noMicro',
 						help = 'Add flag to not use included Microviridae database',
 						action='store_true',
 						dest = 'dbcheck')
@@ -233,7 +233,7 @@ if __name__ == "__main__":
 	outfolder = outputpath + ProtFam + '/'
 
 	fastafai = Fasta(final)
-	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, genomefai))
+	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, genomefai, db))
 	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
 		
@@ -248,4 +248,4 @@ if __name__ == "__main__":
 	subprocess.run(['rm', 'clusteroutput.txt'])
 	os.chdir(workingDirectory)
 	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai', 'microgenomes_05042021.fasta.fai'])
-	print (ff.renderText('Fin!'))
+	print (ff.renderText('Done'))
