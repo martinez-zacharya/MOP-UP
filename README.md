@@ -42,7 +42,7 @@ There are several optional arguments you can add, which include
 	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35%
 	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 80%
 	3. --cpu Number of threads you want Diamond to use. Default is all available threads
-	4. --noDB By adding this argument, you can elect to leave out the Microviridae database from the analysis
+	4. --noMicro By adding this argument, you can elect to leave out the Microviridae database from the analysis
 	5. --singleton Add this flag to remove singletons
 	6. --iter How many infomap iterations to run. Default number is 1000
 	7. --block-size Change block size for Diamond to increase performance depending on available RAM
