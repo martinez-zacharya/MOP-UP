@@ -52,8 +52,9 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 	silix = pandas.read_csv(clustfile, delimiter = '	', names = ['ProteinCluster', 'Gene'])
 
 	cyto = pandas.read_csv(cytofile)
-
-	cyto = cyto[cyto.duplicated(subset='ProteinCluster', keep=False)]
+	
+	#This is commented to keep singletons in protein family directory
+	#cyto = cyto[cyto.duplicated(subset='ProteinCluster', keep=False)]
 
 	cyto = cyto.drop(columns=['Subgroup', 'SubgroupCount'])
 
