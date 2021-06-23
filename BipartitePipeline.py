@@ -232,21 +232,27 @@ if __name__ == "__main__":
 	outdir = outputpath + SubList + '/'
 	subprocess.run(['mkdir', ProtFam])
 	outfolder = outputpath + ProtFam + '/'
+	fff = Figlet(font='poison')
 
 	fastafai = Fasta(final)
 	p1 = multiprocessing.Process(target=ExtractSubgroupMembers, args = (runname+'Master.csv', outdir, genomefai, db))
 	p2 = multiprocessing.Process(target=ExtractTitulars, args = (outputpath+runname+'ForCytoscape.csv', final, fastafai, runname))
 	p3 = multiprocessing.Process(target=ExtractFamilies, args = ('clusteroutput.txt', runname+'ForCytoscape.csv', final, outfolder, fastafai))
-		
+	
 	p1.start()
 	p2.start()
 	p3.start()
-
+	
 	p1.join()
 	p2.join()
 	p3.join()
 	
 	subprocess.run(['rm', 'clusteroutput.txt'])
+	if os.stat("Errors.txt").st_size == 0:	
+		print(ff.renderText('Done'))
+	else:
+		print('Pipeline Failed')
+	
 	os.chdir(workingDirectory)
 	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai', 'microgenomes_05042021.fasta.fai'])
-	print (ff.renderText('Done'))
+

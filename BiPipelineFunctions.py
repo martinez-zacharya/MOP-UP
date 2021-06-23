@@ -5,6 +5,7 @@ import re
 from Bio import SeqIO
 from pyfaidx import Fasta
 from tqdm import tqdm
+from pyfiglet import Figlet
 
 
 
@@ -74,13 +75,18 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 
 	clustlist = clustname['ProteinCluster_x'].tolist()
 
-	for clust in tqdm(clustlist):
-		newfile = open(outfolder + str(clust)+'.fasta', 'a+')
-		snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
-		snippeddf = snippeddf.reset_index(drop=True)
-		for i in range(len(snippeddf)):
-			newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]) + '\n')
-		newfile.close()
+	try:
+		for clust in tqdm(clustlist):
+			newfile = open(outfolder + str(clust)+'.fasta', 'a+')
+			snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
+			snippeddf = snippeddf.reset_index(drop=True)
+			for i in range(len(snippeddf)):
+				newfile.write('>' + str(snippeddf.loc[i, "Gene_y"]) + '\n' + str(fastafai[str(snippeddf.loc[i, "Gene_y"])][0:]) + '\n')
+			newfile.close()
+	except Exception as e:
+		with (open('./Errors.txt', 'a+')) as error:
+			error.write(str(e))
+			print(e)
 
 def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
 	df = pandas.read_csv(cytofile)
