@@ -4,6 +4,8 @@ import subprocess
 import re
 from Bio import SeqIO
 from pyfaidx import Fasta
+from tqdm import tqdm
+
 
 
 def CutToGenome(file, delimiter):
@@ -72,7 +74,7 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 
 	clustlist = clustname['ProteinCluster_x'].tolist()
 
-	for clust in clustlist:
+	for clust in tqdm(clustlist):
 		newfile = open(outfolder + str(clust)+'.fasta', 'a+')
 		snippeddf = cytosilix[cytosilix['ProteinCluster_x'] == str(clust)]
 		snippeddf = snippeddf.reset_index(drop=True)
@@ -87,7 +89,7 @@ def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
 	proteins1 = df1['ProteinCluster']
 	proteins1 = proteins1.drop_duplicates(keep='first')
 	outfasta1 = open(str(nameofrun) + 'ConnectingTitularProteins.fasta', 'a+')
-	for protein in proteins1:
+	for protein in tqdm(proteins1):
 		outfasta1.write('>' + str(protein) + '\n' + str(fastafai[protein][0:])+'\n')
 	outfasta1.close()
 	
@@ -98,7 +100,7 @@ def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
 
 	outfasta = open(str(nameofrun) + 'AllTitularProteins.fasta', 'a+')
 
-	for protein in proteins:
+	for protein in tqdm(proteins):
 		outfasta.write('>' + str(protein) + '\n' + str(fastafai[protein][0:]) + '\n')
 	outfasta.close()
 
@@ -111,7 +113,7 @@ def ExtractSingletons(clustfile, fastafile):
 
 	outfasta = open('Singletons.fasta', 'a+')
 
-	for protein in proteins:
+	for protein in tqdm(proteins):
 		fastas = SeqIO.parse(fastafile, "fasta")
 		for fasta in fastas:
 			name, sequence = fasta.id, str(fasta.seq)
@@ -128,7 +130,7 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
 
 	subgroups = subgroups.drop_duplicates(keep='first')
 
-	for subgroup in subgroups:
+	for subgroup in tqdm(subgroups):
 		subgroupname = str(subgroup)
 		entiresubgroup = grouped.get_group(subgroup).reset_index()
 		if len(entiresubgroup.index) == 1:
@@ -141,7 +143,7 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
 
 	if db == False:
 		os.mkdir(outfolder + 'SubgroupMemberFastaFiles')
-		for subgroup in subgroups:
+		for subgroup in tqdm(subgroups):
 			subgroupname = str(subgroup)
 			entiresubgroup = grouped.get_group(subgroup).reset_index()
 			if len(entiresubgroup.index) == 1:

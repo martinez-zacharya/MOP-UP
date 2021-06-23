@@ -117,14 +117,13 @@ if __name__ == "__main__":
 	genomefai = Fasta('microgenomes_05042021.fasta')
 
 
-
 	subprocess.run([diamondcmd, "makedb", "--in", final, "-d", "db"], check = True)
 
 	if dmndsens == False:
 		subprocess.run([diamondcmd, "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads', blockarg], check = True)
 	else:
 		subprocess.run([diamondcmd, "blastp", "-d", "db", "-q", final,"-o", "allvall.csv", "-p", 'threads', blockarg, dmndsens], check = True)
-
+	
 
 	outputpath = outputpath + "/output"
 
@@ -145,6 +144,7 @@ if __name__ == "__main__":
 		CodeGenomes('CutFile.txt')
 
 	subprocess.run(['infomap', '-i', 'bipartite', '--clu', '-2', '-N', infoiters, '-s', '1', 'Coded.txt', './'], check = True)
+
 
 	#Import Silix output
 	clustdf = pandas.read_csv('clusteroutput.txt', delimiter='	', names=['ProteinCluster', 'Gene'])
@@ -212,6 +212,7 @@ if __name__ == "__main__":
 	clustdf.to_csv(outputpath + runname + 'CytoscapeHelper.csv',index = None, sep=',', mode='w', header=['Protein', 'Annotation'])
 	df6.to_csv(outputpath + runname + 'ForCytoscape.csv',index = None, sep=',', mode='w', header=['Subgroup', 'SubgroupCount', 'ProteinCluster'])
 
+
 	subprocess.run(['rm', 'Coded.clu', 'Coded.txt', 'CutFile.txt','allvall.csv', 'db.dmnd'])
 	if args.singleton == True:
 		subprocess.run(['rm', 'CutFileSinless.txt'])
@@ -244,7 +245,7 @@ if __name__ == "__main__":
 	p1.join()
 	p2.join()
 	p3.join()
-
+	
 	subprocess.run(['rm', 'clusteroutput.txt'])
 	os.chdir(workingDirectory)
 	subprocess.run(['rm', 'final.fasta', 'final.fasta.fai', 'microgenomes_05042021.fasta.fai'])
