@@ -139,27 +139,21 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
 	for subgroup in tqdm(subgroups):
 		subgroupname = str(subgroup)
 		entiresubgroup = grouped.get_group(subgroup).reset_index()
-		if len(entiresubgroup.index) == 1:
-			pass
-		else:
-			newfile = open(outfolder + 'SubgroupMemberTextFiles/' + subgroupname + '.txt', 'a+')
-			for ind in entiresubgroup.index:
-				newfile.write(entiresubgroup['Genome'][ind] + '\n')
-			newfile.close()
+		newfile = open(outfolder + 'SubgroupMemberTextFiles/' + subgroupname + '.txt', 'a+')
+		for ind in entiresubgroup.index:
+			newfile.write(entiresubgroup['Genome'][ind] + '\n')
+		newfile.close()
 
 	if db == False:
 		os.mkdir(outfolder + 'SubgroupMemberFastaFiles')
 		for subgroup in tqdm(subgroups):
 			subgroupname = str(subgroup)
 			entiresubgroup = grouped.get_group(subgroup).reset_index()
-			if len(entiresubgroup.index) == 1:
-				pass
-			else:
-				newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
-				for ind in entiresubgroup.index:
-					try:
-						newfile.write('>' + str(entiresubgroup['Genome'][ind]) + '\n' + str(genomefai[entiresubgroup['Genome'][ind]][0:]) + '\n')
-					except KeyError:
-						pass
-				newfile.close()
+			newfile = open(outfolder + 'SubgroupMemberFastaFiles/' + subgroupname + '.fasta', 'a+')
+			for ind in entiresubgroup.index:
+				try:
+					newfile.write('>' + str(entiresubgroup['Genome'][ind]) + '\n' + str(genomefai[entiresubgroup['Genome'][ind]][0:]) + '\n')
+				except KeyError:
+					pass
+			newfile.close()
 
