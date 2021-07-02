@@ -5,7 +5,7 @@ Version : 0.9.2
 
 1. This has only been run on Ubuntu, however it might still be able to run on other Linux distros and MacOS.
 
-2. Input ```$ Git clone https://github.com/martinez-zacharya/MicroPipe.git```
+2. Input ```$ git clone https://github.com/martinez-zacharya/MicroPipe.git```
 
 3. You need to install various things including
 
