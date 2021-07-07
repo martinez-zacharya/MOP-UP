@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 	f = Figlet(font='speed')
 	ff = Figlet(font='doh')
-	print (f.renderText('MicroPipe'))
+	print (f.renderText('MicroPidia'))
 
 
 	parser = argparse.ArgumentParser()
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
 	if db == False:
 		with open('final.fasta', 'w') as file:
-			subprocess.run(['cat', 'Micro05042021.fasta', fasta], stdout = file)
+			subprocess.run(['cat', 'Microviridae_06072021.fasta', fasta], stdout = file)
 		file.close()
 
 		final = str(os.getcwd()) + '/final.fasta'
