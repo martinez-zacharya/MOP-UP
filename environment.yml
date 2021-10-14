@@ -1,4 +1,4 @@
-name: bipartite
+name: mop-up
 channels:
   - statiskit
   - anaconda
@@ -72,5 +72,5 @@ dependencies:
     - pyfiglet==0.8.post1
     - regex==2020.7.14
     - subprocess-run==0.0.8
-prefix: /stor/home/miniconda3/envs/bipartite
+prefix: /stor/home/miniconda3/envs/mop-up
 

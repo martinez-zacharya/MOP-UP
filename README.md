@@ -1,17 +1,17 @@
-Version : 0.9.2
+Version : 0.9.5
 
 
 **SETUP**
 
-1. This has only been run on Ubuntu, however it might still be able to run on other Linux distros and MacOS.
+1. This has only been run on Ubuntu, but it might work on other Linux distros
 
-2. Input ```$ git clone https://github.com/martinez-zacharya/MicroPipe.git```
+2. Input ```$ git clone https://github.com/martinez-zacharya/MicroPipe.git``` into the command line
 
 3. You need to install various things including
 
   	1. If using Ubuntu, build-essential ```$ sudo apt-get install build-essential```
   	2. SiLiX (http://lbbe.univ-lyon1.fr/-SiLiX-?lang=en)
-		1. Make sure to place the silix file into the same directory as BipartitePipeline.py and make it exectuable
+		1. Make sure to place the silix file into the same directory as mop-up.py and make it exectuable
 	3. Miniconda (https://docs.conda.io/en/latest/miniconda.html)
 
 4. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
@@ -50,7 +50,7 @@ There are several optional arguments you can add, which include
 
 An example command
 
-```$ python3 BipartitePipeline.py TestRun /stor/home/Proteomes.fasta @ /stor/work/TestRunOutput --cpu 12```
+```$ python3 mop-up.py TestRun /stor/home/Proteomes.fasta @ /stor/work/TestRunOutput --cpu 12```
 
 **OUTPUT**
 
