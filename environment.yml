@@ -72,5 +72,6 @@ dependencies:
     - pyfiglet==0.8.post1
     - regex==2020.7.14
     - subprocess-run==0.0.8
+    - tqdm
 prefix: /stor/home/miniconda3/envs/mop-up
 
