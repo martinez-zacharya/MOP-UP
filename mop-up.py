@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     if db == False:
         with open("final.fasta", "w") as file:
-            subprocess.run(["cat", "Microviridae_06072021.fasta", fasta], stdout=file)
+            subprocess.run(["cat", "Micro2022_02_24_input.fasta", fasta], stdout=file)
         file.close()
 
         final = str(os.getcwd()) + "/final.fasta"
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     diamondcmd = str(os.getcwd()) + "/./diamond"
     silixcmd = str(os.getcwd()) + "/silix"
-    genomefai = Fasta("microgenomes_05042021.fasta")
+    genomefai = Fasta("microgenomes_20220204.fasta")
 
     subprocess.run([diamondcmd, "makedb", "--in", final, "-d", "db"], check=True)
 
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     # Drops duplicates
     spreadf = spreadf.drop_duplicates(keep="first", inplace=False)
     # Imports metadata
-    metadata = pandas.read_csv("Metadata.csv")
+    metadata = pandas.read_csv("metadata_2022_02_24.csv")
     metadata = metadata[["Genome", "Source", "Larger_context_source"]]
     spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome")
     spreadf = spreadf.drop(columns=["Genome"])
@@ -369,5 +369,5 @@ if __name__ == "__main__":
 
     os.chdir(workingDirectory)
     subprocess.run(
-        ["rm", "final.fasta", "final.fasta.fai", "microgenomes_05042021.fasta.fai"]
+        ["rm", "final.fasta", "final.fasta.fai", "microgenomes_20220204.fasta.fai"]
     )
