@@ -35,9 +35,9 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--miniden",
-        help="Minimum percent identity to accept blast hits for building families. Default is 0.35",
+        help="Minimum percent identity to accept blast hits for building families. Default is 0.30",
         action="store",
-        default=0.35,
+        default=0.30,
         dest="miniden",
     )
 
