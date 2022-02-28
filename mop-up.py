@@ -271,13 +271,13 @@ if __name__ == "__main__":
     spreadf = spreadf.drop_duplicates(keep="first", inplace=False)
     # Imports metadata
     metadata = pandas.read_csv("metadata_2022_02_24.csv")
-    metadata = metadata[["Genome", "Source", "Larger_context_source"]]
+    metadata = metadata[["Genome", "Source (detailed)", "Source (larger context)"]]
     spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome")
     spreadf = spreadf.drop(columns=["Genome"])
     spreadf.to_csv(
         outputpath + runname + "Master.csv",
         mode="w",
-        header=["NetworkID", "Genome", "Subgroup", "Source", "Larger_Context_Source"],
+        header=["NetworkID", "Genome", "Subgroup", "Source (detailed)", "Source (larger context)"],
         index=None,
         sep=",",
     )
