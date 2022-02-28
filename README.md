@@ -13,11 +13,11 @@ Version : 0.9.5
   	2. SiLiX (https://lbbe-web.univ-lyon1.fr/fr/SiLix)
 		1. Make sure to place the silix file into the same directory as mop-up.py and make it exectuable
 	3. Miniconda (https://docs.conda.io/en/latest/miniconda.html)
+4. Enter the mop-up directory, enter ```$conda activate
+5. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
 
-4. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
 
-
-5. You need a protein fasta file with 
+6. You need a protein fasta file with 
 	1. No spaces in the headers
 	2. A delimiter that serves as a cutoff between genome name and gene name, where to the left of the delimiter is the genome and to the right is the gene. In the example below, the delimiter is "@". Also, make sure the delimiter is a valid character that can be used in a filename, unlike "&".
 
