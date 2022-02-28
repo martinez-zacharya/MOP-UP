@@ -3,7 +3,7 @@ Version : 0.9.5
 
 **SETUP**
 
-1. This has only been run on Ubuntu, but it might work on other Linux distros
+1. This has only been tested on Ubuntu, but it might work on other Linux distributions.
 
 2. Input ```$ git clone https://github.com/martinez-zacharya/MicroPipe.git``` into the command line
 
@@ -37,14 +37,14 @@ To run, first make sure that diamond, silix and the python scripts that come wit
 	3. The delimiter that separates the cutoff between Genome and Gene, such as '@'
 	4. The full path to your desired output directory
 	
-There are several optional arguments you can add, which include
+There are several optional arguments you can add, see below. The most important is --miniden, which at 30% is used to find clusters of microviral families, and at 50% is used to define genera.
 
-	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35%
+	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35% # PAUL NOTE MAKE THIS 30%!
 	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 80%
 	3. --cpu Number of threads you want Diamond to use. Default is all available threads
-	4. --noMicro By adding this argument, you can elect to leave out the Microviridae database from the analysis
+	4. --noMicro By adding this argument, you can elect to leave out the Microviridae database from the analysis. MOP-UP will then only work with the user-provided files
 	5. --singleton Add this flag to remove singletons
-	6. --iter How many infomap iterations to run. Default number is 1000
+	6. --iter How many infomap iterations to run. Default number is 1000. Fewer runs result in more 
 	7. --block-size Change block size for Diamond to increase performance depending on available RAM
 	8. --sensitivity Tune alignment sensitivity for Diamond. Options include mid-sensitive, sensitive, more-sensitive, very-sensitive, and ultra-sensitive
 
@@ -66,5 +66,7 @@ Here is a brief description of the MOP-UP output
 	7. nameofrunSubgroupMembers - A directory that contains text files for each subgroup with the subgroup members listed
 
 **HOW TO VIEW AND INTERPRET OUTPUT IN CYTOSCAPE**
+
 Download Cytoscape from https://cytoscape.org/
+
 Open Cytoscape, 
