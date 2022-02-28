@@ -5,7 +5,7 @@ Version : 0.9.5
 
 1. This has only been tested on Ubuntu, but it might work on other Linux distributions.
 
-2. Input ```$ git clone https://github.com/martinez-zacharya/MicroPipe.git``` into the command line
+2. Input ```$ git clone https://github.com/martinez-zacharya/MOP-UP``` into the command line
 
 3. You need to install various things including
 
