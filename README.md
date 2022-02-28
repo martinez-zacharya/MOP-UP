@@ -9,9 +9,9 @@ Version : 0.9.5
 
 3. You need to install various things including
 
-  	1. If using Ubuntu, build-essential ```$ sudo apt-get install build-essential```
+  	1. If using Ubuntu, build-essential ```$ sudo apt-get install build-essential```. You might already have this installed.
   	2. SiLiX (https://lbbe-web.univ-lyon1.fr/fr/SiLix)
-		1. Make sure to place the silix file into the same directory as mop-up.py and make it exectuable
+		1. Make sure to place the silix file into the same directory as mop-up.py and make it exectuable (```$ chmod +x silix```)
 	3. Miniconda (https://docs.conda.io/en/latest/miniconda.html)
 4. Enter the MOP-UP directory, enter ```$conda activate```
 5. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
