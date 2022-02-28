@@ -13,7 +13,7 @@ Version : 0.9.5
   	2. SiLiX (https://lbbe-web.univ-lyon1.fr/fr/SiLix)
 		1. Make sure to place the silix file into the same directory as mop-up.py and make it exectuable
 	3. Miniconda (https://docs.conda.io/en/latest/miniconda.html)
-4. Enter the mop-up directory, enter ```$conda activate
+4. Enter the mop-up directory, enter ```$conda activate```
 5. Then you can enter ```$ conda env create -f environment.yml``` to create the necessary conda environment
 
 
