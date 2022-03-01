@@ -42,15 +42,14 @@ There are several optional arguments you can add, see below. The most important 
 	1. --miniden Minimum percent identity to accept blast hits for building families. Default is 35% # PAUL NOTE MAKE THIS 30%!
 	2. --minover Minimum percent overlap to accept blast hits for building families. Default is 80%
 	3. --cpu Number of threads you want Diamond to use. Default is all available threads
-	4. --noMicro By adding this argument, you can elect to leave out the Microviridae database from the analysis. MOP-UP will then only work with the user-provided files
-	5. --singleton Add this flag to remove singletons
-	6. --iter How many infomap iterations to run. Default number is 1000. Fewer runs result in more 
-	7. --block-size Change block size for Diamond to increase performance depending on available RAM
-	8. --sensitivity Tune alignment sensitivity for Diamond. Options include mid-sensitive, sensitive, more-sensitive, very-sensitive, and ultra-sensitive
+	4. --noMicro By adding this argument, you can elect to leave out the Microviridae database from the analysis. MOP-UP will then only work with the user- 
+	     provided files
+	5. --iter How many infomap iterations to run. Default number is 1000. Fewer runs result in more 
+	6. --block-size Change block size for Diamond to increase performance depending on available RAM
 
-An example command
+An example command. Note the "@" after the full path to the input file, it denotes the delimiter for your data. 
 
-```$ python3 mop-up.py TestRun /path/to/Bipartite_pipeline.py/Input.fasta @ /path/to/TestRunOutput --cpu 12```
+```$ python3 mop-up.py <name_of_your_run> /path/to/Bipartite_pipeline.py/Input.fasta @ /path/to/TestRunOutput --cpu 12```
 
 **OUTPUT**
 
@@ -65,7 +64,8 @@ Here is a brief description of the MOP-UP output. nameofrunForCytoscape.csv and 
 	5. nameofrunMaster.csv - The master file that lists all of the genomes in the Micropipe run and their respective network ID and subgroup (i.e. group of   
 	                             closely related genomes)
 	6. nameofrunProteinFamilies - A directory filled with fasta files for each protein cluster. Useful for alignments.
-	7. nameofrunSubgroupMembers - A directory that contains text files for each subgroup with the subgroup members listed. Can be used to extract groups of closely related phages from 
+	7. nameofrunSubgroupMembers - A directory that contains text files for each subgroup with the subgroup members listed. Can be used to extract the genomes of  
+	                             of closely related phages from microgenomes_20220204.fasta. 
 
 **HOW TO VIEW OUTPUT IN CYTOSCAPE**
 
@@ -83,3 +83,9 @@ Here is a brief description of the MOP-UP output. nameofrunForCytoscape.csv and 
 
 Check the nameofrunMaster.csv file to see what "subgroup" your genomes are falling into. If you ran MOP-UP at 50% miniden, they might be in a subgroup of 	        closely related genomes of syntenic gene order (operationally we call those genera, if you ran it at 30% miniden this group will include more distantly 	   related genomes too). Either way your genomes might be grouped with taxonomically defined phages and you can determine what yours are through the names of their close relatives. This could be something like FamilyX_subgroup_name-of-genome, for example Family3_Shukshmavirinae_MG945270 for a member of the Shukshmavirinae subfamily in Family 3. If there are no taxonomically assigned phages in the subgroup, search for your genomes in the Cytoscape network. Most likely, they are connected to a family-defining VP1, if not at the minid =50 network then at the minid=30 network. You can figure that out visually, or by right clicking on your subgroup of choice and clicking Select > Select first neighbours. It will highligh the proteins it is connected to, leading you to the VP1 of interest. If your genome is a singleton unconnected to any VP1s, you will have to resort to phylogenetics again. The file nameofrunConnectingTitularProteins.fasta might be useful since it will contain all required family-defining and singleton VP1s for tree building (among others). Note that many singleton genomes still clearly fall into families and are not automatically new families or whatnot. Instances of that are indicated as FamilyX_associated in the MOP-UP database. 
 	   
+**OTHER NOTES**
+- If for whatever reason MOP-UP quits with an error (most likely because the input files are not properly formatted), delete all the files created in the folder.    
+  These would normally be deleted automatically upon completion but give you more errors if they are still around.
+- The file  All_databases_input.fasta was used to create Figure 4,  wastewater_plasmids_input.fasta Figure S4. You can look at them for proper formatting.
+- There is nothing preventing you from running MOP-UP with non-microviral genomes. If you're bored of microviruses, usee the --noMicro argument to turn off the 
+  default database. 
