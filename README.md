@@ -49,7 +49,7 @@ There are several optional arguments you can add, see below. The most important 
 
 An example command. Note the "@" after the full path to the input file, it denotes the delimiter for your data. 
 
-```$ python3 mop-up.py <name_of_your_run> /path/to/Bipartite_pipeline.py/Input.fasta @ /path/to/TestRunOutput --cpu 12```
+```$ python3 mop-up.py <name_of_your_run> /path/to/mop-up.py/Input.fasta @ /path/to/TestRunOutput --cpu 12```
 
 **OUTPUT**
 
