@@ -87,5 +87,5 @@ Check the nameofrunMaster.csv file to see what "subgroup" your genomes are falli
 - If for whatever reason MOP-UP quits with an error (most likely because the input files are not properly formatted), delete all the files created in the folder.    
   These would normally be deleted automatically upon completion but give you more errors if they are still around.
 - The file  All_databases_input.fasta was used to create Figure 4,  wastewater_plasmids_input.fasta Figure S4. You can look at them for proper formatting.
-- There is nothing preventing you from running MOP-UP with non-microviral genomes. If you're bored of microviruses, usee the --noMicro argument to turn off the 
+- There is nothing preventing you from running MOP-UP with non-microviral genomes. If you're bored of microviruses, use the --noMicro argument to turn off the 
   default database. 
