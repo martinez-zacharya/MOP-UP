@@ -1,5 +1,8 @@
-Version : 0.9.5
+Version : 1.0.0
 
+# MOP-UP
+
+**M**icrovirus **O**rganization **P**ipeline **U**sing **P**rotein **S**haring
 
 **SETUP**
 
