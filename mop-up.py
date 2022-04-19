@@ -243,8 +243,8 @@ if __name__ == "__main__":
     )
 
     # Merge infomap input with genomes to protein clusters to get a table with network ID and
-    # Protein clusters from infomap input, and also genomes and protein clusters from the modified
-    # Silix output
+    # protein clusters from infomap input, and also genomes and protein clusters from the modified
+    # silix output
     fulldf = df1.merge(decodedf, how="outer", left_index=True, right_index=True)
 
     # Merges the infomap output to the df with genomes, PCs and network IDs on network IDs,
@@ -256,28 +256,30 @@ if __name__ == "__main__":
     # which will be used for naming the subgroups
     firstuniqs = df3.drop_duplicates(subset="B_y", keep="first")
     firstuniqs = firstuniqs.drop(columns=["B_x", "Cluster", "C"])
-
+    firstuniqs.to_csv('firstuniqs.csv')
     # This merges the new subgroup name (first genome alphabetically in the subgroup),
     # to df3, which gives each genome a subgroup name
     newdf = df3.merge(firstuniqs, how="left", left_on="B_y", right_on="B_y")
     df5 = newdf.drop(columns=["A_x", "B_y", "C", "Genome_x", "B_x"])
-
+    df5.to_csv('df5.csv')
     # for the master spreadsheet to link network id to genome to subgroup
     # This drops all duplicate entries that arise from merging
     spreadf = newdf.drop_duplicates(keep="first", inplace=False)
     # Drops uneccessary columns
+    # spreadf = spreadf.drop(columns=["B_y", "B_x", "C", "A_y", "C"])
     spreadf = spreadf.drop(columns=["Cluster", "B_y", "B_x", "C", "A_y", "C"])
     # Drops duplicates
     spreadf = spreadf.drop_duplicates(keep="first", inplace=False)
     # Imports metadata
-    metadata = pandas.read_csv("metadata_2022_02_24.csv")
-    metadata = metadata[["Genome", "Source (detailed)", "Source (larger context)"]]
-    spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome")
-    spreadf = spreadf.drop(columns=["Genome"])
+    metadata = pandas.read_csv("Metadata.csv", comment="#", header = 1)
+    metadata = metadata[["Genome designation", "Reported Source", "Source Attribution for Analyses", "GC content", "Sequence Length (nt)", "Phylum", "Class", "Order", "Family", "Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct?"]]
+    spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome designation")
+    spreadf = spreadf.drop(columns=["Genome designation"])
+    spreadf.to_csv('spreadf2.csv')
     spreadf.to_csv(
         outputpath + runname + "Master.csv",
         mode="w",
-        header=["NetworkID", "Genome", "Subgroup", "Source (detailed)", "Source (larger context)"],
+        header=["NetworkID", "Genome designation", "Subgroup", "Reported Source", "Source Attribution for Analyses", "GC content", "Sequence Length (nt)", "Phylum", "Class", "Order", "Family", "Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct?"],
         index=None,
         sep=",",
     )

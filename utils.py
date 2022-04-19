@@ -160,7 +160,7 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
             outfolder + "SubgroupMemberTextFiles/" + subgroupname + ".txt", "a+"
         )
         for ind in entiresubgroup.index:
-            newfile.write(entiresubgroup["Genome"][ind] + "\n")
+            newfile.write(entiresubgroup["Genome designation"][ind] + "\n")
         newfile.close()
 
     if db == False:
@@ -175,9 +175,9 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
                 try:
                     newfile.write(
                         ">"
-                        + str(entiresubgroup["Genome"][ind])
+                        + str(entiresubgroup["Genome designation"][ind])
                         + "\n"
-                        + str(genomefai[entiresubgroup["Genome"][ind]][0:])
+                        + str(genomefai[entiresubgroup["Genome designation"][ind]][0:])
                         + "\n"
                     )
                 except KeyError:
