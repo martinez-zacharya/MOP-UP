@@ -4,6 +4,8 @@ Version : 1.0.0
 
 **M**icrovirus **O**rganization **P**ipeline **U**sing **P**rotein **S**haring
 
+Publication: https://journals.asm.org/doi/10.1128/mbio.00588-22
+
 **SETUP**
 
 1. This has only been tested on Ubuntu, but it might work on other Linux distributions.
