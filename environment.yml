@@ -6,7 +6,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - biopython=1.77=py38h1e0a361_0
+  - biopython
   - pandas=1.0.5=py38h0573a6f_0
   - pyfaidx=0.5.9.5=pyh3252c3a_0
   - pip=20.2.4=py38_0

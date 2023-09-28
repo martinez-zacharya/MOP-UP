@@ -113,6 +113,10 @@ if __name__ == "__main__":
 
     blockarg = "-b" + blocksize
 
+    if not os.path.exists(os.path.abspath(outputpath)):
+        os.mkdir(outputpath)
+    outpath = os.path.abspath(outputpath)
+
     workingDirectory = os.getcwd()
 
     if db == False:
@@ -168,11 +172,11 @@ if __name__ == "__main__":
             ],
             check=True,
         )
-
-    outputpath = outputpath + "/output"
-
+    outputpath = os.path.join(outputpath, "mop-up_output")
+    subprocess.run(["mkdir", outputpath])
+    outpath = os.path.abspath(outputpath)
     with open("clusteroutput.txt", "w") as file:
-        subprocess.run(["mkdir", outputpath])
+        # subprocess.run(["mkdir", outputpath])
         subprocess.run(
             [
                 silixcmd,
@@ -324,31 +328,35 @@ if __name__ == "__main__":
 
     os.rename(clustpath, outputpath + "clusteroutput.txt")
 
-    os.chdir(outputpath)
+    # os.chdir(outputpath)
 
     SubList = runname + "SubgroupMemberLists"
     ProtFam = runname + "ProteinFamilies"
 
-    subprocess.run(["mkdir", SubList])
-    outdir = outputpath + SubList + "/"
-    subprocess.run(["mkdir", ProtFam])
-    outfolder = outputpath + ProtFam + "/"
+    # subprocess.run(["mkdir", SubList])
+    # outdir = outputpath + SubList + "/"
+    outdir = os.path.join(outpath, SubList)
+    os.mkdir(outdir)
+    # subprocess.run(["mkdir", ProtFam])
+    # outfolder = outputpath + ProtFam + "/"
+    outfolder = os.path.join(outputpath, ProtFam)
+    os.mkdir(outfolder)
     fff = Figlet(font="poison")
 
     fastafai = Fasta(final)
     p1 = multiprocessing.Process(
         target=ExtractSubgroupMembers,
-        args=(runname + "Master.csv", outdir, genomefai, db),
+        args=(os.path.join(outpath, runname + "Master.csv"), outdir, genomefai, db),
     )
     p2 = multiprocessing.Process(
         target=ExtractTitulars,
-        args=(outputpath + runname + "ForCytoscape.csv", final, fastafai, runname),
+        args=(os.path.join(outpath, runname + "ForCytoscape.csv"), final, fastafai, runname),
     )
     p3 = multiprocessing.Process(
         target=ExtractFamilies,
         args=(
-            "clusteroutput.txt",
-            runname + "ForCytoscape.csv",
+            os.path.join(outpath, "clusteroutput.txt"),
+            os.path.join(outpath, runname + "ForCytoscape.csv"),
             final,
             outfolder,
             fastafai,
@@ -363,7 +371,7 @@ if __name__ == "__main__":
     p2.join()
     p3.join()
 
-    subprocess.run(["rm", "clusteroutput.txt"])
+    subprocess.run(["rm", os.path.join(outpath, "clusteroutput.txt")])
     if os.stat("Errors.txt").st_size == 0:
         print(ff.renderText("Done"))
     else:

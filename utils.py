@@ -87,7 +87,8 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
 
         try:
             for clust in tqdm(clustlist):
-                newfile = open(outfolder + str(clust) + ".fasta", "a+")
+                name = os.path.join(outfolder, f'{str(clust)}_.fasta')
+                newfile = open(name, "a+")
                 snippeddf = cytosilix[cytosilix["ProteinCluster_x"] == str(clust)]
                 snippeddf = snippeddf.reset_index(drop=True)
                 for i in range(len(snippeddf)):
@@ -145,7 +146,7 @@ def ExtractSingletons(clustfile, fastafile):
 
 
 def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
-    os.mkdir(outfolder + "SubgroupMemberTextFiles")
+    os.mkdir(os.path.join(outfolder, "SubgroupMemberTextFiles"))
     df = pandas.read_csv(masterfile)
     grouped = df.groupby(df.Subgroup)
 
@@ -157,19 +158,19 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
         subgroupname = str(subgroup)
         entiresubgroup = grouped.get_group(subgroup).reset_index()
         newfile = open(
-            outfolder + "SubgroupMemberTextFiles/" + subgroupname + ".txt", "a+"
+            outfolder + "/SubgroupMemberTextFiles/" + subgroupname + ".txt", "a+"
         )
         for ind in entiresubgroup.index:
             newfile.write(entiresubgroup["Genome designation"][ind] + "\n")
         newfile.close()
 
     if db == False:
-        os.mkdir(outfolder + "SubgroupMemberFastaFiles")
+        os.mkdir(outfolder + "/SubgroupMemberFastaFiles")
         for subgroup in tqdm(subgroups):
             subgroupname = str(subgroup)
             entiresubgroup = grouped.get_group(subgroup).reset_index()
             newfile = open(
-                outfolder + "SubgroupMemberFastaFiles/" + subgroupname + ".fasta", "a+"
+                outfolder + "/SubgroupMemberFastaFiles/" + subgroupname + ".fasta", "a+"
             )
             for ind in entiresubgroup.index:
                 try:
