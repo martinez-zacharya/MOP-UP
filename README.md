@@ -92,9 +92,13 @@ Here is a brief description of the MOP-UP output. nameofrunForCytoscape.csv and 
 
 Check the nameofrunMaster.csv file to see what "subgroup" your genomes are falling into. If you ran MOP-UP at 50% miniden, they might be in a subgroup of closely related genomes of syntenic gene order (operationally we call those genera). If you ran it at 30% miniden this group will include more distantly related genomes too. Either way your genomes might be grouped with taxonomically defined phages from our database.
 
-If you want to transfer this inferred taxonomy to your genomes, you can run the program copy_taxonomy.py on your nameofrunMaster.csv file, giving it the input file and the name of the output file to create:
+If you want to transfer this inferred taxonomy to your genomes, you can run the program copy_taxonomy.py on your nameofrunMaster.csv file:
 
-```$ python3 /path/to/MOP-UP/copy_taxonomy.py /path/to/nameofrunMaster.csv /path/to/nameofrunMaster_filled.csv```
+```$ python3 /path/to/MOP-UP/copy_taxonomy.py /path/to/nameofrunMaster.csv```
+
+By default this writes nameofrunMaster_Mapped-Taxonomy.csv to your current directory. To choose a different name or location, add an output path (absolute or relative) as a second argument:
+
+```$ python3 /path/to/MOP-UP/copy_taxonomy.py /path/to/nameofrunMaster.csv /path/to/my_output.csv```
 
 This will generate a new file where your genomes, if they fall into a cluster with known taxonomized genomes, will be labeled according to that taxonomy. The script will also spit out a number of warnings about discrepancies, e.g. “010_MH617318 has multiple phage_Genus values: ['Almacaqusvirus', 'Almacaqusvirus-associated']”, meaning that the clustering algorithm has clustered together multiple phages with different taxonomic annotations. This is most likely to happen if you use a miniden cutoff of less than 50% (which should separate genus-level groups).
 

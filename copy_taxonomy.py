@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas as pd
 
@@ -6,8 +7,16 @@ parser = argparse.ArgumentParser(
     description="Copy phage taxonomy from database genomes onto the other genomes in the same MOP-UP subgroup"
 )
 parser.add_argument("input", help="MOP-UP Master.csv file (e.g. nameofrunMaster.csv)")
-parser.add_argument("output", help="Path for the taxonomy-filled csv file")
+parser.add_argument(
+    "output",
+    nargs="?",
+    help="Path for the taxonomy-filled csv file. Default: <input name>_Mapped-Taxonomy.csv in the current directory",
+)
 args = parser.parse_args()
+
+if args.output is None:
+    inputname = os.path.splitext(os.path.basename(args.input))[0]
+    args.output = os.path.join(os.getcwd(), inputname + "_Mapped-Taxonomy.csv")
 
 df = pd.read_csv(args.input)
 
@@ -48,3 +57,4 @@ for subgroup, group in df.groupby("Subgroup"):
             df.loc[mask, col] = fill_value
 
 df.to_csv(args.output, index=False)
+print(f"Wrote {args.output}")
