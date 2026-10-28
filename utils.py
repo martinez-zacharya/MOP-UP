@@ -88,7 +88,7 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
         try:
             for clust in tqdm(clustlist):
                 name = os.path.join(outfolder, f'{str(clust)}_.fasta')
-                newfile = open(name, "a+")
+                newfile = open(name, "w")
                 snippeddf = cytosilix[cytosilix["ProteinCluster_x"] == str(clust)]
                 snippeddf = snippeddf.reset_index(drop=True)
                 for i in range(len(snippeddf)):
@@ -105,13 +105,13 @@ def ExtractFamilies(clustfile, cytofile, fastafile, outfolder, fastafai):
             print(e)
 
 
-def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
+def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun, outdir):
     df = pandas.read_csv(cytofile)
 
     df1 = df[df.duplicated(subset=["ProteinCluster"], keep="first")]
     proteins1 = df1["ProteinCluster"]
     proteins1 = proteins1.drop_duplicates(keep="first")
-    outfasta1 = open(str(nameofrun) + "ConnectingTitularProteins.fasta", "a+")
+    outfasta1 = open(os.path.join(outdir, str(nameofrun) + "ConnectingTitularProteins.fasta"), "w")
     for protein in tqdm(proteins1):
         outfasta1.write(">" + str(protein) + "\n" + str(fastafai[protein][0:]) + "\n")
     outfasta1.close()
@@ -120,7 +120,7 @@ def ExtractTitulars(cytofile, fastafile, fastafai, nameofrun):
 
     proteins = proteins.drop_duplicates(keep="first")
 
-    outfasta = open(str(nameofrun) + "AllTitularProteins.fasta", "a+")
+    outfasta = open(os.path.join(outdir, str(nameofrun) + "AllTitularProteins.fasta"), "w")
 
     for protein in tqdm(proteins):
         outfasta.write(">" + str(protein) + "\n" + str(fastafai[protein][0:]) + "\n")
@@ -146,7 +146,7 @@ def ExtractSingletons(clustfile, fastafile):
 
 
 def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
-    os.mkdir(os.path.join(outfolder, "SubgroupMemberTextFiles"))
+    os.makedirs(os.path.join(outfolder, "SubgroupMemberTextFiles"), exist_ok=True)
     df = pandas.read_csv(masterfile)
     grouped = df.groupby(df.Subgroup)
 
@@ -158,27 +158,27 @@ def ExtractSubgroupMembers(masterfile, outfolder, genomefai, db):
         subgroupname = str(subgroup)
         entiresubgroup = grouped.get_group(subgroup).reset_index()
         newfile = open(
-            outfolder + "/SubgroupMemberTextFiles/" + subgroupname + ".txt", "a+"
+            outfolder + "/SubgroupMemberTextFiles/" + subgroupname + ".txt", "w"
         )
         for ind in entiresubgroup.index:
-            newfile.write(entiresubgroup["Genome designation"][ind] + "\n")
+            newfile.write(entiresubgroup["Genome"][ind] + "\n")
         newfile.close()
 
     if db == False:
-        os.mkdir(outfolder + "/SubgroupMemberFastaFiles")
+        os.makedirs(outfolder + "/SubgroupMemberFastaFiles", exist_ok=True)
         for subgroup in tqdm(subgroups):
             subgroupname = str(subgroup)
             entiresubgroup = grouped.get_group(subgroup).reset_index()
             newfile = open(
-                outfolder + "/SubgroupMemberFastaFiles/" + subgroupname + ".fasta", "a+"
+                outfolder + "/SubgroupMemberFastaFiles/" + subgroupname + ".fasta", "w"
             )
             for ind in entiresubgroup.index:
                 try:
                     newfile.write(
                         ">"
-                        + str(entiresubgroup["Genome designation"][ind])
+                        + str(entiresubgroup["Genome"][ind])
                         + "\n"
-                        + str(genomefai[entiresubgroup["Genome designation"][ind]][0:])
+                        + str(genomefai[entiresubgroup["Genome"][ind]][0:])
                         + "\n"
                     )
                 except KeyError:

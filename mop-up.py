@@ -15,6 +15,7 @@ from utils import (
 from pyfiglet import Figlet
 from time import process_time
 from pyfaidx import Fasta
+from datetime import datetime
 
 
 if __name__ == "__main__":
@@ -95,14 +96,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fasta = args.fasta
+    fasta = os.path.abspath(args.fasta)
     delim = args.delimiter
     minimumidentity = str(args.miniden)
     minimumoverlap = str(args.minover)
     sinless = args.singleton
     runname = args.nameofrun
     threads = str(args.diamondthreads)
-    outputpath = args.outputfolder
+    outputpath = os.path.abspath(args.outputfolder)
     db = args.dbcheck
     infoiters = str(args.iters)
     blocksize = str(args.block)
@@ -113,27 +114,33 @@ if __name__ == "__main__":
 
     blockarg = "-b" + blocksize
 
-    if not os.path.exists(os.path.abspath(outputpath)):
-        os.mkdir(outputpath)
-    outpath = os.path.abspath(outputpath)
-
     workingDirectory = os.getcwd()
+    repoDirectory = os.path.dirname(os.path.abspath(__file__))
 
+    diamondcmd = os.path.join(repoDirectory, "diamond")
+    silixcmd = os.path.join(repoDirectory, "silix")
+    microgenomes_path = os.path.join(repoDirectory, "micro20261027_genomes.fasta")
+    microviridae_db = os.path.join(repoDirectory, "micro20261027_proteins.fasta")
+    metadata_path = os.path.join(repoDirectory, "metadata20261027.csv")
+
+    mopup_dir = os.path.join(outputpath, "mop-up_output")
+    tmp_dir = os.path.join(mopup_dir, "tmp_" + datetime.now().strftime("%Y%m%d_%H%M%S"))
+    os.makedirs(tmp_dir, exist_ok=True)
+    open(os.path.join(tmp_dir, "Errors.txt"), "w").close()
+    os.chdir(tmp_dir)
+
+    outpath = mopup_dir
+    outputpath = mopup_dir + "/"
+
+    final = os.path.join(tmp_dir, "final.fasta")
     if db == False:
-        with open("final.fasta", "w") as file:
-            subprocess.run(["cat", "Micro2022_02_24_input.fasta", fasta], stdout=file)
-        file.close()
-
-        final = str(os.getcwd()) + "/final.fasta"
+        with open(final, "w") as file:
+            subprocess.run(["cat", microviridae_db, fasta], stdout=file)
     else:
-        with open("final.fasta", "w") as finalfile:
+        with open(final, "w") as finalfile:
             subprocess.run(["cat", fasta], stdout=finalfile)
-        finalfile.close()
-        final = str(os.getcwd()) + "/final.fasta"
 
-    diamondcmd = str(os.getcwd()) + "/./diamond"
-    silixcmd = str(os.getcwd()) + "/silix"
-    genomefai = Fasta("microgenomes_20220204.fasta")
+    genomefai = Fasta(microgenomes_path)
 
     subprocess.run([diamondcmd, "makedb", "--in", final, "-d", "db"], check=True)
 
@@ -149,7 +156,7 @@ if __name__ == "__main__":
                 "-o",
                 "allvall.csv",
                 "-p",
-                "threads",
+                threads,
                 blockarg,
             ],
             check=True,
@@ -166,15 +173,12 @@ if __name__ == "__main__":
                 "-o",
                 "allvall.csv",
                 "-p",
-                "threads",
+                threads,
                 blockarg,
                 dmndsens,
             ],
             check=True,
         )
-    outputpath = os.path.join(outputpath, "mop-up_output")
-    subprocess.run(["mkdir", outputpath])
-    outpath = os.path.abspath(outputpath)
     with open("clusteroutput.txt", "w") as file:
         # subprocess.run(["mkdir", outputpath])
         subprocess.run(
@@ -189,10 +193,6 @@ if __name__ == "__main__":
             ],
             stdout=file,
         )
-
-    outputog = outputpath
-
-    outputpath = outputpath + "/"
 
     CutToGenome("clusteroutput.txt", delim)
 
@@ -275,15 +275,15 @@ if __name__ == "__main__":
     # Drops duplicates
     spreadf = spreadf.drop_duplicates(keep="first", inplace=False)
     # Imports metadata
-    metadata = pandas.read_csv("Metadata.csv", comment="#", header = 1)
-    metadata = metadata[["Genome designation", "Reported Source", "Source Attribution for Analyses", "GC content", "Sequence Length (nt)", "Phylum", "Class", "Order", "Family", "Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct?"]]
-    spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome designation")
-    spreadf = spreadf.drop(columns=["Genome designation"])
+    metadata = pandas.read_csv(metadata_path)
+    metadata = metadata[["Genome", "Source (detailed)", "Source (larger context)", "GC content", "Sequence Length", "phage_Class", "phage_Order", "phage_Family", "phage_Genus", "phage_Species", "MOP-UP Cluster", "host_Phylum", "host_Class", "host_Order", "host_Family", "host_Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct"]]
+    spreadf = spreadf.merge(metadata, how="left", left_on="Genome_x", right_on="Genome")
+    spreadf = spreadf.drop(columns=["Genome"])
     spreadf.to_csv('spreadf2.csv')
     spreadf.to_csv(
         outputpath + runname + "Master.csv",
         mode="w",
-        header=["NetworkID", "Genome designation", "Subgroup", "Reported Source", "Source Attribution for Analyses", "GC content", "Sequence Length (nt)", "Phylum", "Class", "Order", "Family", "Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct?"],
+        header=["NetworkID", "Genome", "Subgroup", "Source (detailed)", "Source (larger context)", "GC content", "Sequence Length", "phage_Class", "phage_Order", "phage_Family", "phage_Genus", "phage_Species", "MOP-UP Cluster", "host_Phylum", "host_Class", "host_Order", "host_Family", "host_Genus", "Genus CRISPR prediction", "CRISPR Prediction Correct"],
         index=None,
         sep=",",
     )
@@ -316,31 +316,17 @@ if __name__ == "__main__":
         header=["Subgroup", "SubgroupCount", "ProteinCluster"],
     )
 
-    subprocess.run(
-        ["rm", "Coded.clu", "Coded.txt", "CutFile.txt", "allvall.csv", "db.dmnd"]
-    )
-    if args.singleton == True:
-        subprocess.run(["rm", "CutFileSinless.txt"])
-
-    path = os.path.abspath(os.getcwd())
-
-    clustpath = str(path) + "/clusteroutput.txt"
-
-    os.rename(clustpath, outputpath + "clusteroutput.txt")
-
-    # os.chdir(outputpath)
-
     SubList = runname + "SubgroupMemberLists"
     ProtFam = runname + "ProteinFamilies"
 
     # subprocess.run(["mkdir", SubList])
     # outdir = outputpath + SubList + "/"
     outdir = os.path.join(outpath, SubList)
-    os.mkdir(outdir)
+    os.makedirs(outdir, exist_ok=True)
     # subprocess.run(["mkdir", ProtFam])
     # outfolder = outputpath + ProtFam + "/"
     outfolder = os.path.join(outputpath, ProtFam)
-    os.mkdir(outfolder)
+    os.makedirs(outfolder, exist_ok=True)
     fff = Figlet(font="poison")
 
     fastafai = Fasta(final)
@@ -350,12 +336,12 @@ if __name__ == "__main__":
     )
     p2 = multiprocessing.Process(
         target=ExtractTitulars,
-        args=(os.path.join(outpath, runname + "ForCytoscape.csv"), final, fastafai, runname),
+        args=(os.path.join(outpath, runname + "ForCytoscape.csv"), final, fastafai, runname, outpath),
     )
     p3 = multiprocessing.Process(
         target=ExtractFamilies,
         args=(
-            os.path.join(outpath, "clusteroutput.txt"),
+            os.path.join(tmp_dir, "clusteroutput.txt"),
             os.path.join(outpath, runname + "ForCytoscape.csv"),
             final,
             outfolder,
@@ -371,13 +357,12 @@ if __name__ == "__main__":
     p2.join()
     p3.join()
 
-    subprocess.run(["rm", os.path.join(outpath, "clusteroutput.txt")])
-    if os.stat("Errors.txt").st_size == 0:
+    if os.stat(os.path.join(tmp_dir, "Errors.txt")).st_size == 0:
         print(ff.renderText("Done"))
     else:
         print("Pipeline Failed")
 
     os.chdir(workingDirectory)
-    subprocess.run(
-        ["rm", "final.fasta", "final.fasta.fai", "microgenomes_20220204.fasta.fai"]
-    )
+    fai_path = microgenomes_path + ".fai"
+    if os.path.exists(fai_path):
+        os.remove(fai_path)
